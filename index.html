@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#141310">
+<title>For — a practice of remembering</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%;
+    background: #211f1a;
+    font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100dvh; gap: 22px; padding: 24px 16px 20px;
+  }
+
+  /* ---- The phone: full-bleed on real phones, framed on desktop ---- */
+  .phone {
+    position: relative;
+    width: min(100%, 402px);
+    height: min(calc(100dvh - 120px), 874px);
+    border-radius: 40px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05);
+    background: var(--bg);
+  }
+  @media (max-width: 460px) {
+    body { padding: 0; gap: 0; }
+    .phone { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
+    .dock { position: fixed; bottom: 0; left: 0; right: 0; }
+  }
+
+  /* ---- Theme tokens ---- */
+  .phone[data-theme="dark"] {
+    --bg:#141310; --card:rgba(230,224,208,0.06);
+    --fg-strong:#efe9dc; --fg:#d7d1c2;
+    --muted:rgba(215,209,194,0.44); --faint:rgba(215,209,194,0.20);
+    --accent:#aab598;
+    --accent-glow:radial-gradient(circle, rgba(170,181,152,0.16), rgba(170,181,152,0) 70%);
+    --accent-line:rgba(170,181,152,0.45); --hair:rgba(215,209,194,0.12);
+  }
+  .phone[data-theme="paper"] {
+    --bg:#faf8f3; --card:rgba(255,255,255,0.72);
+    --fg-strong:#2b2a26; --fg:#4b4843;
+    --muted:rgba(75,72,67,0.62); --faint:rgba(75,72,67,0.32);
+    --accent:#58654d;
+    --accent-glow:radial-gradient(circle, rgba(88,101,77,0.12), rgba(88,101,77,0) 70%);
+    --accent-line:rgba(88,101,77,0.4); --hair:rgba(75,72,67,0.14);
+  }
+
+  .screen {
+    position: absolute; inset: 0;
+    background: var(--bg); color: var(--fg);
+    display: flex; flex-direction: column;
+    font-family: 'Hanken Grotesk', sans-serif;
+  }
+  .serif { font-family: 'Source Serif 4', Georgia, serif; }
+
+  /* ---- Animations (from the concept) ---- */
+  @keyframes forBreathe { 0%,100%{ transform:scale(0.62); opacity:0.45; } 50%{ transform:scale(1.04); opacity:0.92; } }
+  @keyframes forFade { from{ opacity:0; } to{ opacity:1; } }
+  @keyframes forRise { from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
+  @keyframes forHint { 0%,55%{ opacity:0; } 100%{ opacity:0.4; } }
+  @keyframes forPulse { 0%,100%{ opacity:0.25; } 50%{ opacity:0.7; } }
+
+  .tap { cursor: pointer; -webkit-tap-highlight-color: transparent; }
+
+  /* ---- Demo dock (preview only — not part of the app) ---- */
+  .dock {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    width: min(100%, 460px);
+  }
+  .dock .pills { display:flex; flex-wrap:wrap; justify-content:center; gap:5px 7px; }
+  .dock .pill {
+    cursor:pointer; font-size:12px; letter-spacing:0.03em; padding:6px 12px;
+    border-radius:999px; color:rgba(233,228,214,0.42); transition:all 180ms; user-select:none;
+  }
+  .dock .pill[data-active="true"] { color:#e9e4d6; background:rgba(170,181,152,0.18); }
+  .dock .row { display:flex; align-items:center; gap:16px; flex-wrap:wrap; justify-content:center; }
+  .dock .seg { display:flex; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:999px; padding:3px; }
+  .dock .seg div { cursor:pointer; font-size:12px; letter-spacing:0.05em; padding:7px 18px; border-radius:999px; transition:all 180ms; color:rgba(233,228,214,0.5); user-select:none; }
+  .dock .seg div[data-on="true"] { color:#141310; background:#aab598; font-weight:600; }
+  .dock .slider { display:flex; align-items:center; gap:10px; color:rgba(233,228,214,0.5); font-size:12px; letter-spacing:0.04em; }
+  .dock input[type=range] { accent-color:#aab598; width:120px; }
+  .dock .note { font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(233,228,214,0.28); }
+  textarea:focus { outline: none; }
+  textarea::placeholder { color: var(--faint); }
+</style>
+</head>
+<body>
+
+  <div class="phone" id="phone" data-theme="dark">
+    <div class="screen" id="screen"></div>
+  </div>
+
+  <!-- preview controls; not part of the shipped app -->
+  <div class="dock">
+    <div class="pills" id="pills"></div>
+    <div class="row">
+      <div class="seg" id="themeSeg">
+        <div data-theme-set="dark" data-on="true">Dark</div>
+        <div data-theme-set="paper" data-on="false">Paper</div>
+      </div>
+      <div class="slider">
+        <span>pause</span>
+        <input type="range" id="pauseRange" min="10" max="60" step="5" value="30">
+        <span id="pauseLabel">30s</span>
+      </div>
+    </div>
+    <div class="note">a concept — used briefly, then put down</div>
+  </div>
+
+<script>
+(function () {
+  const QUESTIONS = [
+    "Where were you, just before this?",
+    "What is running you right now?",
+    "Are you here, or is something doing this for you?",
+    "Can you feel yourself sitting here?",
+    "What did you just miss?",
+  ];
+
+  const NAV = [
+    { key: "splash",   label: "Splash" },
+    { key: "lock",     label: "The call" },
+    { key: "pause",    label: "The pause" },
+    { key: "question", label: "The question" },
+    { key: "about",    label: "About" },
+    { key: "byoq",     label: "Your question" },
+  ];
+
+  const state = {
+    screen: "splash",
+    theme: "dark",
+    qIndex: 0,
+    byoqStage: "open",   // 'open' | 'done'
+    pauseSeconds: 30,
+  };
+
+  const phone   = document.getElementById("phone");
+  const screen  = document.getElementById("screen");
+  const pillsEl = document.getElementById("pills");
+  let timer = null;
+
+  const rand = () => Math.floor(Math.random() * QUESTIONS.length);
+  const clearTimer = () => { if (timer) { clearTimeout(timer); timer = null; } };
+
+  // ---- Screens -------------------------------------------------------------
+  const screens = {
+    splash: () => `
+      <div class="tap" data-go="lock" style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 40px 56px; animation:forFade 1.6s ease both;">
+        <div style="flex:1"></div>
+        <div class="serif" style="font-size:82px; font-weight:400; line-height:1; letter-spacing:-0.01em; color:var(--fg-strong);">for<span style="color:var(--accent)">.</span></div>
+        <div style="margin-top:22px; font-size:12.5px; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted);">a practice of remembering</div>
+        <div style="flex:1"></div>
+        <div style="font-size:13px; letter-spacing:0.14em; color:var(--faint); animation:forPulse 4.5s ease-in-out infinite;">touch to enter</div>
+      </div>`,
+
+    lock: () => `
+      <div style="height:100%; display:flex; flex-direction:column; align-items:center; padding:88px 22px 44px; animation:forFade 1.4s ease both;">
+        <div class="serif" style="font-weight:300; font-size:76px; line-height:1; color:var(--fg-strong); letter-spacing:-0.02em;">9:41</div>
+        <div style="margin-top:10px; font-size:15px; color:var(--muted);">Wednesday, July 8</div>
+        <div style="flex:1"></div>
+        <div class="tap" data-go="pause" style="width:100%; background:var(--card); border:1px solid var(--hair); border-radius:22px; padding:16px 17px; animation:forRise 1s ease both; animation-delay:0.5s; opacity:0;">
+          <div style="display:flex; align-items:center; gap:9px; margin-bottom:9px;">
+            <div class="serif" style="width:20px; height:20px; border-radius:6px; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg);">f</div>
+            <div style="font-size:13px; font-weight:600; letter-spacing:0.04em; color:var(--fg); text-transform:uppercase;">For</div>
+            <div style="flex:1"></div>
+            <div style="font-size:12.5px; color:var(--muted);">now</div>
+          </div>
+          <div class="serif" style="font-size:21px; line-height:1.3; color:var(--fg-strong);">Wake up. You're here.</div>
+        </div>
+        <div style="margin-top:22px; font-size:12.5px; letter-spacing:0.06em; color:var(--faint);">it will not always come</div>
+      </div>`,
+
+    pause: () => `
+      <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 40px; animation:forFade 2s ease both; overflow:hidden;">
+        <div style="flex:1; display:flex; align-items:center; justify-content:center; width:100%;">
+          <div style="position:relative; width:200px; height:200px; display:flex; align-items:center; justify-content:center;">
+            <div style="position:absolute; width:200px; height:200px; border-radius:50%; border:1px solid var(--accent); animation:forBreathe 12s ease-in-out infinite;"></div>
+            <div style="position:absolute; width:200px; height:200px; border-radius:50%; background:var(--accent-glow); animation:forBreathe 12s ease-in-out infinite;"></div>
+            <div style="width:7px; height:7px; border-radius:50%; background:var(--accent); opacity:0.85;"></div>
+          </div>
+        </div>
+        <div style="height:40px; display:flex; align-items:center;">
+          <div style="font-size:13px; letter-spacing:0.24em; text-transform:uppercase; color:var(--faint); animation:forHint 8s ease both;">stay</div>
+        </div>
+      </div>`,
+
+    question: () => `
+      <div class="tap" data-go="rest" style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:72px 44px; animation:forFade 2.4s ease both;">
+        <div style="flex:1"></div>
+        <div class="serif" style="font-size:31px; font-weight:400; line-height:1.42; text-align:center; text-wrap:balance; color:var(--fg-strong); animation:forRise 2.2s ease both;">${QUESTIONS[state.qIndex]}</div>
+        <div style="flex:1"></div>
+        <div style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint); animation:forHint 10s ease both;">sit — then close when you're ready</div>
+      </div>`,
+
+    rest: () => `
+      <div style="height:100%; display:flex; align-items:center; justify-content:center; padding:64px; animation:forFade 2.2s ease both;">
+        <div class="serif" style="font-style:italic; font-size:19px; color:var(--faint);">put it down</div>
+      </div>`,
+
+    about: () => `
+      <div style="height:100%; overflow-y:auto; padding:80px 30px 56px; animation:forFade 1.2s ease both;">
+        <div class="serif" style="font-size:15px; letter-spacing:0.16em; text-transform:uppercase; color:var(--accent); margin-bottom:20px;">About this group</div>
+        <div class="serif" style="font-size:19px; line-height:1.62; color:var(--fg); margin-bottom:16px;">We are a living group formed in 2026 to study and discuss the ideas of Gurdjieff's Fourth Way. We seek to remember ourselves. We claim no authority or lineage.</div>
+        <div style="font-size:15px; line-height:1.72; color:var(--muted); margin-bottom:14px;">Current members are encouraged to read, reflect, and contribute. All content here is user-generated. It is kept for continued reflection but may not be permanent. The group is alive: members come and go, and what exists in this space is the responsibility of the current users.</div>
+        <div style="height:1px; background:var(--hair); margin:26px 0;"></div>
+        <div class="serif" style="font-size:18px; color:var(--fg-strong); margin-bottom:8px;">Why a phone?</div>
+        <div style="font-size:15px; line-height:1.72; color:var(--muted); margin-bottom:26px;">It's hard to say what Gurdjieff would make of these devices. They're built to be addictive — and the work is to break free of automatism. Learning to use one with attention may be exactly the training.</div>
+        <div class="serif" style="font-size:18px; color:var(--fg-strong); margin-bottom:16px;">Suggestions for being here</div>
+        <div style="display:flex; flex-direction:column; gap:20px;">
+          ${[
+            ["When it calls you, stop.", "The app calls to you briefly. Be present for the moment it gives you — that moment is the point. You may react, but you need not engage."],
+            ["Bring questions.", "Post them to ask yourself and the group. You are the text of this group. A question may be lived with and left unresolved; within each one, answers may already exist. Resist the desire to mine them. Let the questions remain unmolested."],
+            ["Bring attention.", "You may take part fully just by being present — without commenting, questioning, or posting at all. Until more is needed, there are no rules for how you do or don't engage."],
+            ["Keep the goal in view.", "We are here to remember ourselves — to bring mind, body, and soul together as we question our way to waking."],
+          ].map(([h, b]) => `
+            <div>
+              <div class="serif" style="font-style:italic; font-size:16px; color:var(--fg); margin-bottom:5px;">${h}</div>
+              <div style="font-size:14.5px; line-height:1.7; color:var(--muted);">${b}</div>
+            </div>`).join("")}
+        </div>
+        <div style="height:20px;"></div>
+      </div>`,
+
+    byoq: () => state.byoqStage === "open" ? `
+      <div style="height:100%; display:flex; flex-direction:column; padding:96px 34px 56px; animation:forFade 1.2s ease both;">
+        <div class="serif" style="font-size:15px; letter-spacing:0.16em; text-transform:uppercase; color:var(--accent); margin-bottom:26px;">A question of your own</div>
+        <div class="serif" style="font-size:24px; line-height:1.4; color:var(--fg-strong); margin-bottom:8px;">Leave a question with the group.</div>
+        <div style="font-size:14.5px; line-height:1.7; color:var(--muted); margin-bottom:34px;">Not to be answered. To be lived with. No one will like it, count it, or reply.</div>
+        <textarea id="byoqInput" rows="3" placeholder="What do you want to sit with?" style="width:100%; background:transparent; border:none; border-bottom:1px solid var(--hair); padding:8px 0; font-family:'Source Serif 4',serif; font-size:20px; line-height:1.4; color:var(--fg-strong); resize:none;"></textarea>
+        <div style="flex:1"></div>
+        <div class="tap" data-action="submitByoq" style="align-self:center; font-size:13px; letter-spacing:0.16em; text-transform:uppercase; color:var(--accent); border:1px solid var(--accent-line); border-radius:999px; padding:13px 30px;">Leave it</div>
+      </div>` : `
+      <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:64px 34px; animation:forFade 1.4s ease both;">
+        <div class="serif" style="font-style:italic; font-size:22px; color:var(--fg-strong); margin-bottom:14px;">It's with the group.</div>
+        <div style="font-size:14px; line-height:1.7; color:var(--muted); max-width:240px;">Let it be. It will find you, or someone, another day.</div>
+      </div>`,
+  };
+
+  // ---- Render & navigation -------------------------------------------------
+  function render() {
+    phone.setAttribute("data-theme", state.theme);
+    screen.innerHTML = screens[state.screen]();
+    renderPills();
+  }
+
+  function go(name) {
+    clearTimer();
+    if (name === "question") state.qIndex = rand();
+    if (name === "byoq") state.byoqStage = "open";
+    state.screen = name;
+    render();
+
+    if (name === "pause") {
+      timer = setTimeout(() => { go("question"); }, state.pauseSeconds * 1000);
+    } else if (name === "rest") {
+      timer = setTimeout(() => { go("splash"); }, 4500);
+    }
+  }
+
+  function renderPills() {
+    pillsEl.innerHTML = NAV.map(n => {
+      const active = state.screen === n.key || (n.key === "question" && state.screen === "rest");
+      return `<div class="pill" data-active="${active}" data-go="${n.key}">${n.label}</div>`;
+    }).join("");
+  }
+
+  // ---- Events (delegated) --------------------------------------------------
+  document.addEventListener("click", (e) => {
+    const goEl = e.target.closest("[data-go]");
+    if (goEl) { go(goEl.getAttribute("data-go")); return; }
+    const act = e.target.closest("[data-action]");
+    if (act && act.getAttribute("data-action") === "submitByoq") {
+      state.byoqStage = "done";
+      render();
+      return;
+    }
+    const themeEl = e.target.closest("[data-theme-set]");
+    if (themeEl) {
+      state.theme = themeEl.getAttribute("data-theme-set");
+      document.querySelectorAll("#themeSeg [data-theme-set]").forEach(d =>
+        d.setAttribute("data-on", d.getAttribute("data-theme-set") === state.theme));
+      phone.setAttribute("data-theme", state.theme);
+      return;
+    }
+  });
+
+  const pauseRange = document.getElementById("pauseRange");
+  const pauseLabel = document.getElementById("pauseLabel");
+  pauseRange.addEventListener("input", () => {
+    state.pauseSeconds = Number(pauseRange.value);
+    pauseLabel.textContent = state.pauseSeconds + "s";
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
