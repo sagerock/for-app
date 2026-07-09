@@ -42,6 +42,7 @@
 
   .tap { cursor: pointer; -webkit-tap-highlight-color: transparent; }
   .act { font-size:13px; letter-spacing:0.16em; text-transform:uppercase; }
+  .replies-link { font-size:13px; letter-spacing:0.06em; color:var(--accent); border-bottom:1px solid var(--accent-line); padding-bottom:2px; }
 
   .dock { display: flex; flex-direction: column; align-items: center; gap: 12px; width: min(100%, 460px); }
   .dock .pills { display:flex; flex-wrap:wrap; justify-content:center; gap:5px 7px; }
@@ -86,21 +87,31 @@
         <span id="pauseLabel">30s</span>
       </div>
     </div>
-    <div class="note">a concept — used briefly, then put down</div>
+    <div class="note">home wakes you · the study room is where the work is kept</div>
   </div>
 
 <script>
 (function () {
-  // Questions the group has left with each other — original, in the spirit of the work.
-  const GROUP_QUESTIONS = [
-    "What woke you today — if anything did?",
-    "Where do you go when you disappear?",
-    "What are you pretending not to know?",
-    "Who is asking?",
-    "When did you last feel your own weight?",
-    "What runs you when no one is watching?",
-    "What would you notice if you moved half as fast?",
-    "What are you still carrying that was never yours?",
+  // The group's questions and the replies left with them. Original, in the spirit of the work.
+  // Some replies are themselves questions (isQ). This is the only content the study room holds.
+  const GROUP = [
+    { q: "What woke you today — if anything did?", replies: [
+        { t: "Nothing, until the kettle. Then I was here for one second." },
+        { t: "Is being woken the same as waking?", isQ: true } ] },
+    { q: "Where do you go when you disappear?", replies: [] },
+    { q: "What are you pretending not to know?", replies: [
+        { t: "That I heard it the first time." },
+        { t: "That the pretending is the comfortable part." },
+        { t: "What would change if I admitted it?", isQ: true } ] },
+    { q: "Who is asking?", replies: [
+        { t: "I keep answering before I find out." } ] },
+    { q: "When did you last feel your own weight?", replies: [] },
+    { q: "What runs you when no one is watching?", replies: [
+        { t: "The next thing. Always the next thing." } ] },
+    { q: "What would you notice if you moved half as fast?", replies: [] },
+    { q: "What are you still carrying that was never yours?", replies: [
+        { t: "A voice that isn't mine, telling me to hurry." },
+        { t: "Whose is it, then?", isQ: true } ] },
   ];
 
   const NAV = [
@@ -108,8 +119,8 @@
     { key: "lock",      label: "The call" },
     { key: "pause",     label: "The pause" },
     { key: "questions", label: "Questions" },
+    { key: "study",     label: "Study Room" },
     { key: "about",     label: "About" },
-    { key: "byoq",      label: "Your question" },
   ];
 
   const state = {
@@ -117,8 +128,8 @@
     theme: "dark",
     sound: true,
     pauseSeconds: 30,
-    callQuestions: [],   // questions pulled this call (max 2)
-    currentQ: "",        // question currently shown
+    callIdxs: [],       // question indices pulled this call (max 2)
+    currentIdx: null,   // question currently in focus
     byoqStage: "open",
   };
 
@@ -128,6 +139,8 @@
   let timer = null;
 
   const clearTimer = () => { if (timer) { clearTimeout(timer); timer = null; } };
+  const curQ = () => (state.currentIdx == null ? null : GROUP[state.currentIdx]);
+  const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
   // ---- Sound: soft two-note chimes via Web Audio -------------------------
   let audioCtx = null;
@@ -138,10 +151,9 @@
   function chime(kind) {
     if (!state.sound || !audioCtx) return;
     const now = audioCtx.currentTime;
-    const notes = kind === "open" ? [587.33, 880.0] : [880.0, 587.33]; // rise to open, fall to close
+    const notes = kind === "open" ? [587.33, 880.0] : [880.0, 587.33];
     notes.forEach((f, i) => {
-      const o = audioCtx.createOscillator();
-      const g = audioCtx.createGain();
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
       o.type = "sine"; o.frequency.value = f;
       const t = now + i * 0.30;
       g.gain.setValueAtTime(0.0001, t);
@@ -154,11 +166,12 @@
 
   // ---- Questions ----------------------------------------------------------
   function pullQuestion() {
-    const pool = GROUP_QUESTIONS.filter(q => !state.callQuestions.includes(q));
-    const q = pool[Math.floor(Math.random() * pool.length)] || GROUP_QUESTIONS[0];
-    state.callQuestions.push(q);
-    state.currentQ = q;
+    const avail = GROUP.map((_, i) => i).filter(i => !state.callIdxs.includes(i));
+    const idx = avail.length ? avail[Math.floor(Math.random() * avail.length)] : 0;
+    state.callIdxs.push(idx);
+    state.currentIdx = idx;
   }
+  function ensureFocus() { if (state.currentIdx == null) state.currentIdx = Math.floor(Math.random() * GROUP.length); }
 
   // ---- Screens ------------------------------------------------------------
   const screens = {
@@ -174,7 +187,7 @@
     lock: () => `
       <div style="height:100%; display:flex; flex-direction:column; align-items:center; padding:88px 22px 44px; animation:forFade 1.4s ease both;">
         <div class="serif" style="font-weight:300; font-size:76px; line-height:1; color:var(--fg-strong); letter-spacing:-0.02em;">9:41</div>
-        <div style="margin-top:10px; font-size:15px; color:var(--muted);">Wednesday, July 8</div>
+        <div style="margin-top:10px; font-size:15px; color:var(--muted);">Thursday, July 9</div>
         <div style="flex:1"></div>
         <div class="tap" data-go="pause" style="width:100%; background:var(--card); border:1px solid var(--hair); border-radius:22px; padding:16px 17px; animation:forRise 1s ease both; animation-delay:0.5s; opacity:0;">
           <div style="display:flex; align-items:center; gap:9px; margin-bottom:9px;">
@@ -202,29 +215,71 @@
         </div>
       </div>`,
 
-    questions: () => `
+    // HOME question surface — pure. The only way deeper is the quiet "replies" link.
+    questions: () => {
+      const q = curQ();
+      const n = q.replies.length;
+      const label = n > 0 ? `${n} ${n === 1 ? "reply" : "replies"} — enter the study room` : "no replies yet — enter the study room";
+      return `
       <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 40px 44px; animation:forFade 1.6s ease both;">
         <div style="flex:1"></div>
-        <div class="serif" style="font-size:30px; font-weight:400; line-height:1.42; text-align:center; text-wrap:balance; color:var(--fg-strong); animation:forRise 1.8s ease both;">${state.currentQ}</div>
+        <div class="serif" style="font-size:30px; font-weight:400; line-height:1.42; text-align:center; text-wrap:balance; color:var(--fg-strong); animation:forRise 1.8s ease both;">${esc(q.q)}</div>
+        <div style="margin-top:22px; animation:forHint 3.5s ease both;">
+          <span class="tap replies-link" data-go="study">${label}</span>
+        </div>
         <div style="flex:1"></div>
         <div style="display:flex; flex-direction:column; align-items:center; gap:18px; animation:forHint 4s ease both;">
-          <div style="display:flex; gap:26px; align-items:center;">
-            <span class="tap act" data-go="respond" style="color:var(--accent);">respond</span>
-            ${state.callQuestions.length < 2 ? `<span class="tap act" data-action="another" style="color:var(--muted);">another</span>` : ``}
-          </div>
+          ${state.callIdxs.length < 2 ? `<span class="tap act" data-action="another" style="color:var(--muted);">another</span>` : ``}
           <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">put it down</div>
         </div>
-      </div>`,
+      </div>`;
+    },
 
-    respond: () => `
+    // THE STUDY ROOM — the only place to read replies, reply, or ask. It may scroll; take your time.
+    study: () => {
+      const q = curQ();
+      const n = q.replies.length;
+      const body = n === 0
+        ? `<div style="font-size:15px; line-height:1.7; color:var(--muted); font-style:italic;">No one has replied. You could be the first — or let it stand, unanswered.</div>`
+        : q.replies.map(r => r.isQ
+            ? `<div style="margin-bottom:24px;">
+                 <div class="serif" style="font-style:italic; font-size:18px; line-height:1.5; color:var(--fg-strong);">${esc(r.t)}</div>
+                 <div style="margin-top:6px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--faint);">a question in reply</div>
+               </div>`
+            : `<div style="margin-bottom:24px;">
+                 <div style="font-size:15.5px; line-height:1.72; color:var(--fg);">${esc(r.t)}</div>
+                 <div style="margin-top:6px; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:var(--faint);">a member</div>
+               </div>`).join("");
+      return `
+      <div style="height:100%; overflow-y:auto; padding:72px 28px 40px; animation:forFade 1s ease both;">
+        <div class="serif" style="font-size:14px; letter-spacing:0.18em; text-transform:uppercase; color:var(--accent); margin-bottom:18px;">The Study Room</div>
+        <div class="serif" style="font-size:24px; line-height:1.4; color:var(--fg-strong); margin-bottom:8px;">${esc(q.q)}</div>
+        <div style="font-size:12.5px; letter-spacing:0.06em; color:var(--muted); margin-bottom:24px;">${n} ${n === 1 ? "reply" : "replies"} · no counts kept, no order but arrival</div>
+        <div style="height:1px; background:var(--hair); margin-bottom:26px;"></div>
+        ${body}
+        <div style="height:1px; background:var(--hair); margin:14px 0 26px;"></div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:18px;">
+          <div style="display:flex; gap:26px;">
+            <span class="tap act" data-go="respond" style="color:var(--accent);">Reply</span>
+            <span class="tap act" data-go="byoq" style="color:var(--muted);">Ask a question</span>
+          </div>
+          <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
+        </div>
+      </div>`;
+    },
+
+    respond: () => {
+      const q = curQ();
+      return `
       <div style="height:100%; display:flex; flex-direction:column; padding:84px 34px 44px; animation:forFade 1s ease both;">
         <div class="serif" style="font-size:13px; letter-spacing:0.16em; text-transform:uppercase; color:var(--accent); margin-bottom:16px;">Responding to</div>
-        <div class="serif" style="font-size:21px; line-height:1.4; color:var(--fg-strong); margin-bottom:24px;">${state.currentQ}</div>
+        <div class="serif" style="font-size:21px; line-height:1.4; color:var(--fg-strong); margin-bottom:24px;">${esc(q.q)}</div>
         <textarea id="respondInput" rows="5" placeholder="Say only what's true. No one is timing you." style="width:100%; background:transparent; border:none; border-bottom:1px solid var(--hair); padding:8px 0; font-family:'Source Serif 4',serif; font-size:19px; line-height:1.5; color:var(--fg-strong); resize:none;"></textarea>
         <div style="flex:1"></div>
         <div class="tap act" data-action="reply" style="align-self:center; color:var(--accent); border:1px solid var(--accent-line); border-radius:999px; padding:13px 32px;">Reply</div>
         <div style="text-align:center; margin-top:14px; font-size:11.5px; letter-spacing:0.1em; color:var(--faint);">when you reply, it will hold you a moment</div>
-      </div>`,
+      </div>`;
+    },
 
     freeze: () => `
       <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px; animation:forFade 1.4s ease both;">
@@ -265,14 +320,15 @@
       <div style="height:100%; display:flex; flex-direction:column; padding:96px 34px 56px; animation:forFade 1.2s ease both;">
         <div class="serif" style="font-size:15px; letter-spacing:0.16em; text-transform:uppercase; color:var(--accent); margin-bottom:26px;">A question of your own</div>
         <div class="serif" style="font-size:24px; line-height:1.4; color:var(--fg-strong); margin-bottom:8px;">Leave a question with the group.</div>
-        <div style="font-size:14.5px; line-height:1.7; color:var(--muted); margin-bottom:34px;">Not to be answered. To be lived with. No one will like it, count it, or reply.</div>
+        <div style="font-size:14.5px; line-height:1.7; color:var(--muted); margin-bottom:34px;">Not to be answered. To be lived with. No one will like it, count it, or reply — until, one day, someone does.</div>
         <textarea id="byoqInput" rows="3" placeholder="What do you want to sit with?" style="width:100%; background:transparent; border:none; border-bottom:1px solid var(--hair); padding:8px 0; font-family:'Source Serif 4',serif; font-size:20px; line-height:1.4; color:var(--fg-strong); resize:none;"></textarea>
         <div style="flex:1"></div>
         <div class="tap act" data-action="submitByoq" style="align-self:center; color:var(--accent); border:1px solid var(--accent-line); border-radius:999px; padding:13px 30px;">Leave it</div>
       </div>` : `
       <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:64px 34px; animation:forFade 1.4s ease both;">
         <div class="serif" style="font-style:italic; font-size:22px; color:var(--fg-strong); margin-bottom:14px;">It's with the group.</div>
-        <div style="font-size:14px; line-height:1.7; color:var(--muted); max-width:240px;">Let it be. It will find you, or someone, another day.</div>
+        <div style="font-size:14px; line-height:1.7; color:var(--muted); max-width:250px; margin-bottom:30px;">Let it be. It will find you, or someone, another day.</div>
+        <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">put it down</div>
       </div>`,
   };
 
@@ -286,9 +342,9 @@
   function go(name) {
     clearTimer();
 
-    // A fresh "call" resets the two-per-call question set.
-    if (name === "splash" || name === "lock" || name === "pause") state.callQuestions = [];
-    if (name === "questions" && state.callQuestions.length === 0) pullQuestion();
+    if (name === "splash" || name === "lock" || name === "pause") state.callIdxs = [];
+    if (name === "questions" && state.callIdxs.length === 0) pullQuestion();
+    if (name === "study" || name === "respond" || name === "byoq") ensureFocus();
     if (name === "byoq") state.byoqStage = "open";
 
     state.screen = name;
@@ -307,14 +363,15 @@
   function renderPills() {
     pillsEl.innerHTML = NAV.map(n => {
       const active = state.screen === n.key ||
-        (n.key === "questions" && ["respond", "freeze", "rest"].includes(state.screen));
+        (n.key === "questions" && state.screen === "rest") ||
+        (n.key === "study" && ["respond", "freeze", "byoq"].includes(state.screen));
       return `<div class="pill" data-active="${active}" data-go="${n.key}">${n.label}</div>`;
     }).join("");
   }
 
   // ---- Events -------------------------------------------------------------
   document.addEventListener("click", (e) => {
-    ensureAudio(); // unlock audio on first interaction
+    ensureAudio();
 
     const goEl = e.target.closest("[data-go]");
     if (goEl) { go(goEl.getAttribute("data-go")); return; }
@@ -322,9 +379,19 @@
     const act = e.target.closest("[data-action]");
     if (act) {
       const a = act.getAttribute("data-action");
-      if (a === "another") { if (state.callQuestions.length < 2) pullQuestion(); render(); return; }
-      if (a === "reply") { go("freeze"); return; }
-      if (a === "submitByoq") { state.byoqStage = "done"; render(); return; }
+      if (a === "another") { if (state.callIdxs.length < 2) pullQuestion(); render(); return; }
+      if (a === "reply") {
+        const ta = document.getElementById("respondInput");
+        const val = ta && ta.value.trim();
+        if (val && curQ()) curQ().replies.push({ t: val });
+        go("freeze"); return;
+      }
+      if (a === "submitByoq") {
+        const ta = document.getElementById("byoqInput");
+        const val = ta && ta.value.trim();
+        if (val) { GROUP.push({ q: val, replies: [] }); }
+        state.byoqStage = "done"; render(); return;
+      }
     }
 
     const themeEl = e.target.closest("[data-theme-set]");
@@ -346,7 +413,6 @@
     }
   });
 
-  // Keyboard activation for the segmented toggles
   ["themeSeg", "soundSeg"].forEach(id => {
     document.getElementById(id).addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.target.click(); }
