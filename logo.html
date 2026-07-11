@@ -2,138 +2,186 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#141310">
-<title>For4 — logo studies</title>
+<title>For4 — Identity System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..700;1,8..60,300..700&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#141310; --panel:#1b1a16; --fg:#efe9dc; --muted:rgba(215,209,194,0.55);
-    --faint:rgba(215,209,194,0.30); --accent:#aab598; --hair:rgba(215,209,194,0.12);
-  }
-  *{ box-sizing:border-box; }
-  html,body{ margin:0; background:var(--bg); color:var(--fg);
-    font-family:'Hanken Grotesk',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; -webkit-font-smoothing:antialiased; }
-  .wrap{ max-width:760px; margin:0 auto; padding:56px 22px 80px; }
-  .serif{ font-family:'Source Serif 4',Georgia,serif; }
-  .eyebrow{ font-size:12px; letter-spacing:0.22em; text-transform:uppercase; color:var(--accent); }
-  h1{ font-family:'Source Serif 4',serif; font-weight:400; font-size:34px; margin:14px 0 6px; letter-spacing:-0.01em; }
-  .sub{ color:var(--muted); font-size:15px; line-height:1.6; max-width:56ch; }
-  .concept{ margin:26px 0 8px; padding:18px 20px; border:1px solid var(--hair); border-radius:16px; background:var(--panel); color:var(--muted); font-size:14.5px; line-height:1.7; }
-  .concept b{ color:var(--fg); font-weight:600; }
-  .grid{ display:flex; flex-direction:column; gap:20px; margin-top:26px; }
-  .card{ border:1px solid var(--hair); border-radius:18px; background:var(--panel); padding:26px; display:flex; flex-direction:column; align-items:center; gap:18px; }
-  .card .stage{ width:100%; display:flex; align-items:center; justify-content:center; padding:22px 0; }
-  .meta{ text-align:center; }
-  .meta .name{ font-family:'Source Serif 4',serif; font-size:19px; }
-  .meta .desc{ color:var(--muted); font-size:13.5px; line-height:1.6; margin-top:4px; max-width:46ch; }
-  .row{ display:flex; align-items:center; gap:26px; flex-wrap:wrap; justify-content:center; }
-  .chip{ display:flex; align-items:center; justify-content:center; border-radius:14px; }
-  .chip.dark{ background:#141310; }
-  .chip.paper{ background:#faf8f3; }
-  .chip.small{ width:56px; height:56px; }
-  .chip.tiny{ width:34px; height:34px; }
-  .label{ font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--faint); margin-top:8px; text-align:center; }
-  .wordmark{ font-family:'Source Serif 4',serif; font-weight:400; letter-spacing:-0.01em; color:var(--fg); }
-  .foot{ margin-top:40px; color:var(--faint); font-size:12.5px; letter-spacing:0.04em; text-align:center; }
-  svg{ display:block; }
+  body { margin: 0; background: #141310; }
+  a { color: #aab598; }
+  a:hover { color: #c2cbb0; }
+  svg { display: block; }
 </style>
 </head>
 <body>
-<div class="wrap">
+<div style="max-width: 1200px; width: 100%; margin: 0 auto; background: #141310; color: #e8e4da; font-family: 'Hanken Grotesk', system-ui, sans-serif; padding: clamp(28px, 5vw, 72px) clamp(20px, 5vw, 72px) 88px; box-sizing: border-box;">
 
-  <div class="eyebrow">For4 · logo studies</div>
-  <h1>The F‑square and the 4‑square</h1>
-  <div class="sub">A first crack at Jamie's idea — one square shape, used twice. The <b>F</b> is a square that opens to the <b>right</b>; the <b>4</b> is the same square opening on <b>top</b>. Same shape, rotated a quarter turn. Three directions below; nothing precious, all clay.</div>
-
-  <div class="concept">
-    The move: take a single squarish bracket and turn it. Opening to the right reads as an <b>F</b>; opening upward reads as a <b>4</b>. Placed together they make the mark — and in one version they interlock, the 4 filling exactly where the F opens.
+  <!-- Masthead -->
+  <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid rgba(170,181,152,0.18); padding-bottom: 24px; margin-bottom: 72px;">
+    <div style="font-family: 'Source Serif 4', serif; font-size: 22px; letter-spacing: 0.01em;">For<span style="color: #aab598;">4</span></div>
+    <div style="text-transform: uppercase; letter-spacing: 0.28em; font-size: 11px; color: #8a8578;">Identity System</div>
   </div>
 
-  <div class="grid">
-
-    <!-- A — Monoline, side by side -->
-    <div class="card">
-      <div class="stage">
-        <svg width="220" height="120" viewBox="0 0 190 100" fill="none" stroke="#aab598" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" aria-label="For4 mark, monoline">
-          <path d="M90 10 L10 10 L10 90 L90 90"/>
-          <path d="M100 10 L100 90 L180 90 L180 10"/>
-        </svg>
-      </div>
-      <div class="meta">
-        <div class="name">A · Monoline, paired</div>
-        <div class="desc">The two squares side by side, drawn in a single thin line. Quiet, architectural, reads clearly at small sizes.</div>
-      </div>
-      <div class="row">
-        <div class="chip small dark">
-          <svg width="34" height="20" viewBox="0 0 190 100" fill="none" stroke="#aab598" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><path d="M90 10 L10 10 L10 90 L90 90"/><path d="M100 10 L100 90 L180 90 L180 10"/></svg>
-        </div>
-        <div class="chip small paper">
-          <svg width="34" height="20" viewBox="0 0 190 100" fill="none" stroke="#58654d" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><path d="M90 10 L10 10 L10 90 L90 90"/><path d="M100 10 L100 90 L180 90 L180 10"/></svg>
-        </div>
-        <div class="label">at icon size · dark &amp; paper</div>
-      </div>
-    </div>
-
-    <!-- B — Interlocked -->
-    <div class="card">
-      <div class="stage">
-        <svg width="200" height="120" viewBox="0 0 180 100" fill="none" stroke="#aab598" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" aria-label="For4 mark, interlocked">
-          <path d="M90 10 L10 10 L10 90 L90 90"/>
-          <path d="M90 10 L90 90 L170 90 L170 10"/>
-        </svg>
-      </div>
-      <div class="meta">
-        <div class="name">B · Interlocked</div>
-        <div class="desc">The 4's left edge sits exactly where the F opens — the two squares lock into one shape. Most "logo," most memorable. My pick.</div>
-      </div>
-      <div class="row">
-        <div class="chip small dark">
-          <svg width="36" height="20" viewBox="0 0 180 100" fill="none" stroke="#aab598" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><path d="M90 10 L10 10 L10 90 L90 90"/><path d="M90 10 L90 90 L170 90 L170 10"/></svg>
-        </div>
-        <div class="chip tiny dark">
-          <svg width="22" height="13" viewBox="0 0 180 100" fill="none" stroke="#aab598" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"><path d="M90 10 L10 10 L10 90 L90 90"/><path d="M90 10 L90 90 L170 90 L170 10"/></svg>
-        </div>
-        <div class="chip small paper">
-          <svg width="36" height="20" viewBox="0 0 180 100" fill="none" stroke="#58654d" stroke-width="12" stroke-linecap="round" stroke-linejoin="round"><path d="M90 10 L10 10 L10 90 L90 90"/><path d="M90 10 L90 90 L170 90 L170 10"/></svg>
-        </div>
-        <div class="label">holds down to a favicon</div>
-      </div>
-    </div>
-
-    <!-- C — Bold -->
-    <div class="card">
-      <div class="stage">
-        <svg width="200" height="120" viewBox="0 0 180 100" fill="none" stroke="#aab598" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" aria-label="For4 mark, bold">
-          <path d="M88 16 L16 16 L16 84 L88 84"/>
-          <path d="M92 16 L92 84 L164 84 L164 16"/>
-        </svg>
-      </div>
-      <div class="meta">
-        <div class="name">C · Bold</div>
-        <div class="desc">The interlocked mark with a heavy stroke — more presence on a home screen, warmer and more solid. Same geometry, louder voice.</div>
-      </div>
-    </div>
-
-    <!-- Lockup -->
-    <div class="card">
-      <div class="stage">
-        <div style="display:flex; align-items:center; gap:18px;">
-          <svg width="66" height="40" viewBox="0 0 180 100" fill="none" stroke="#aab598" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"><path d="M90 10 L10 10 L10 90 L90 90"/><path d="M90 10 L90 90 L170 90 L170 10"/></svg>
-          <div class="wordmark" style="font-size:52px;">For<span style="color:#aab598;">4</span></div>
-        </div>
-      </div>
-      <div class="meta">
-        <div class="name">Lockup</div>
-        <div class="desc">Mark + wordmark together (interlocked mark shown). "For" in the type, the "4" carried in sage — echoing where the old period used to sit.</div>
-      </div>
-    </div>
-
+  <!-- Hero lockup -->
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 44px; padding: 40px 0 96px;">
+    <svg viewBox="0 0 176 100" width="360" style="overflow: visible; max-width: 80%;" fill="none" stroke="#aab598" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M88 12 L30 12 Q12 12 12 30 L12 70 Q12 88 30 88 L88 88"/>
+      <g transform="translate(76,0)">
+        <path d="M12 12 L12 70 Q12 88 30 88 L70 88 Q88 88 88 70 L88 12"/>
+      </g>
+    </svg>
+    <div style="font-family: 'Source Serif 4', serif; font-size: clamp(64px, 12vw, 108px); line-height: 1; font-weight: 400; letter-spacing: 0.005em;">For<span style="color: #aab598;">4</span></div>
+    <div style="max-width: 460px; text-align: center; color: #9c988c; font-size: 16px; line-height: 1.6;">A quiet space rooted in the Fourth Way. It pings you to wake up for a moment — then gets out of the way.</div>
   </div>
 
-  <div class="foot">For4 · concept marks — used briefly, then put down</div>
+  <!-- Section: Versions -->
+  <div style="text-transform: uppercase; letter-spacing: 0.24em; font-size: 11px; color: #8a8578; margin-bottom: 28px;">The Mark — Two Constructions</div>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; margin-bottom: 88px;">
+    <div style="background: #1c1a15; border: 1px solid rgba(170,181,152,0.14); border-radius: 16px; padding: 48px 40px 32px; display: flex; flex-direction: column; align-items: center; gap: 40px;">
+      <svg viewBox="0 0 196 100" width="240" style="overflow: visible; max-width: 100%;" fill="none" stroke="#aab598" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M88 12 L30 12 Q12 12 12 30 L12 70 Q12 88 30 88 L88 88"/>
+        <g transform="translate(96,0)">
+          <path d="M12 12 L12 70 Q12 88 30 88 L70 88 Q88 88 88 70 L88 12"/>
+        </g>
+      </svg>
+      <div style="text-align: center;">
+        <div style="font-family: 'Source Serif 4', serif; font-size: 18px; margin-bottom: 6px;">Version A · Paired</div>
+        <div style="color: #8a8578; font-size: 13.5px; line-height: 1.55;">F and 4 stand side by side — two open squares, one shape rotated a quarter turn.</div>
+      </div>
+    </div>
+    <div style="background: #1c1a15; border: 1px solid rgba(170,181,152,0.14); border-radius: 16px; padding: 48px 40px 32px; display: flex; flex-direction: column; align-items: center; gap: 40px;">
+      <svg viewBox="0 0 176 100" width="216" style="overflow: visible; max-width: 100%;" fill="none" stroke="#aab598" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M88 12 L30 12 Q12 12 12 30 L12 70 Q12 88 30 88 L88 88"/>
+        <g transform="translate(76,0)">
+          <path d="M12 12 L12 70 Q12 88 30 88 L70 88 Q88 88 88 70 L88 12"/>
+        </g>
+      </svg>
+      <div style="text-align: center;">
+        <div style="font-family: 'Source Serif 4', serif; font-size: 18px; margin-bottom: 6px;">Version B · Interlocked</div>
+        <div style="color: #8a8578; font-size: 13.5px; line-height: 1.55;">The 4's left edge fills the F's opening — the two lock into one unified form. The primary mark.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section: Construction -->
+  <div style="text-transform: uppercase; letter-spacing: 0.24em; font-size: 11px; color: #8a8578; margin-bottom: 28px;">One Shape, Twice</div>
+  <div style="background: #1c1a15; border: 1px solid rgba(170,181,152,0.14); border-radius: 16px; padding: 56px 40px; margin-bottom: 88px; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 40px;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+      <svg viewBox="0 0 100 100" width="120" fill="none" stroke="#e8e4da" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M88 12 L30 12 Q12 12 12 30 L12 70 Q12 88 30 88 L88 88"/>
+      </svg>
+      <div style="color: #8a8578; font-size: 12.5px; letter-spacing: 0.02em;">open square → <span style="color:#e8e4da;">F</span></div>
+    </div>
+    <div style="color: #6e6a5f; font-size: 26px; font-family: 'Source Serif 4', serif;">↻</div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+      <svg viewBox="0 0 100 100" width="120" fill="none" stroke="#e8e4da" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 12 L12 70 Q12 88 30 88 L70 88 Q88 88 88 70 L88 12"/>
+      </svg>
+      <div style="color: #8a8578; font-size: 12.5px; letter-spacing: 0.02em;">quarter turn → <span style="color:#e8e4da;">4</span></div>
+    </div>
+    <div style="color: #6e6a5f; font-size: 26px; font-family: 'Source Serif 4', serif;">=</div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+      <svg viewBox="0 0 176 100" width="200" style="overflow: visible; max-width: 100%;" fill="none" stroke="#aab598" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M88 12 L30 12 Q12 12 12 30 L12 70 Q12 88 30 88 L88 88"/>
+        <g transform="translate(76,0)">
+          <path d="M12 12 L12 70 Q12 88 30 88 L70 88 Q88 88 88 70 L88 12"/>
+        </g>
+      </svg>
+      <div style="color: #8a8578; font-size: 12.5px; letter-spacing: 0.02em;">interlocked → <span style="color:#aab598;">F4</span></div>
+    </div>
+  </div>
+
+  <!-- Section: Colorways -->
+  <div style="text-transform: uppercase; letter-spacing: 0.24em; font-size: 11px; color: #8a8578; margin-bottom: 28px;">Colorways · Works in a Single Flat Color</div>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 88px;">
+    <div style="border-radius: 16px; overflow: hidden; border: 1px solid rgba(170,181,152,0.14);">
+      <div style="background: #141310; padding: 56px 0; display: flex; justify-content: center;">
+        <svg viewBox="0 0 176 100" width="176" style="overflow: visible; max-width: 70%;" fill="none" stroke="#aab598" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M88 12 L30 12 Q12 12 12 30 L12 70 Q12 88 30 88 L88 88"/>
+          <g transform="translate(76,0)"><path d="M12 12 L12 70 Q12 88 30 88 L70 88 Q88 88 88 70 L88 12"/></g>
+        </svg>
+      </div>
+      <div style="background: #1c1a15; padding: 14px 18px; color: #8a8578; font-size: 12px;">Sage on near-black · primary</div>
+    </div>
+    <div style="border-radius: 16px; overflow: hidden; border: 1px solid rgba(20,19,16,0.1);">
+      <div style="background: #aab598; padding: 56px 0; display: flex; justify-content: center;">
+        <svg viewBox="0 0 176 100" width="176" style="overflow: visible; max-width: 70%;" fill="none" stroke="#141310" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M88 12 L30 12 Q12 12 12 30 L12 70 Q12 88 30 88 L88 88"/>
+          <g transform="translate(76,0)"><path d="M12 12 L12 70 Q12 88 30 88 L70 88 Q88 88 88 70 L88 12"/></g>
+        </svg>
+      </div>
+      <div style="background: #1c1a15; padding: 14px 18px; color: #8a8578; font-size: 12px;">Ink on sage · reversed</div>
+    </div>
+    <div style="border-radius: 16px; overflow: hidden; border: 1px solid rgba(170,181,152,0.14);">
+      <div style="background: #141310; padding: 56px 0; display: flex; justify-content: center;">
+        <svg viewBox="0 0 176 100" width="176" style="overflow: visible; max-width: 70%;" fill="none" stroke="#e8e4da" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M88 12 L30 12 Q12 12 12 30 L12 70 Q12 88 30 88 L88 88"/>
+          <g transform="translate(76,0)"><path d="M12 12 L12 70 Q12 88 30 88 L70 88 Q88 88 88 70 L88 12"/></g>
+        </svg>
+      </div>
+      <div style="background: #1c1a15; padding: 14px 18px; color: #8a8578; font-size: 12px;">Single flat mono</div>
+    </div>
+  </div>
+
+  <!-- Section: App icon + favicon scale -->
+  <div style="text-transform: uppercase; letter-spacing: 0.24em; font-size: 11px; color: #8a8578; margin-bottom: 28px;">App Icon · Legible Shrunk Down</div>
+  <div style="background: #1c1a15; border: 1px solid rgba(170,181,152,0.14); border-radius: 16px; padding: 48px 40px; margin-bottom: 88px; display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: center; gap: 48px;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+      <div style="width: 128px; height: 128px; border-radius: 28px; background: #141310; display: flex; align-items: center; justify-content: center;">
+        <svg viewBox="0 0 176 100" width="88" style="overflow: visible;" fill="none" stroke="#aab598" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M88 12 L30 12 Q12 12 12 30 L12 70 Q12 88 30 88 L88 88"/>
+          <g transform="translate(76,0)"><path d="M12 12 L12 70 Q12 88 30 88 L70 88 Q88 88 88 70 L88 12"/></g>
+        </svg>
+      </div>
+      <div style="color: #8a8578; font-size: 12px;">128 · app icon</div>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+      <div style="width: 64px; height: 64px; border-radius: 15px; background: #141310; display: flex; align-items: center; justify-content: center;">
+        <svg viewBox="0 0 176 100" width="46" style="overflow: visible;" fill="none" stroke="#aab598" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M88 12 L30 12 Q12 12 12 30 L12 70 Q12 88 30 88 L88 88"/>
+          <g transform="translate(76,0)"><path d="M12 12 L12 70 Q12 88 30 88 L70 88 Q88 88 88 70 L88 12"/></g>
+        </svg>
+      </div>
+      <div style="color: #8a8578; font-size: 12px;">64</div>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+      <div style="width: 32px; height: 32px; border-radius: 8px; background: #141310; display: flex; align-items: center; justify-content: center;">
+        <svg viewBox="0 0 176 100" width="23" style="overflow: visible;" fill="none" stroke="#aab598" stroke-width="11" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M88 12 L30 12 Q12 12 12 30 L12 70 Q12 88 30 88 L88 88"/>
+          <g transform="translate(76,0)"><path d="M12 12 L12 70 Q12 88 30 88 L70 88 Q88 88 88 70 L88 12"/></g>
+        </svg>
+      </div>
+      <div style="color: #8a8578; font-size: 12px;">32 · favicon</div>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+      <div style="width: 16px; height: 16px; border-radius: 4px; background: #141310; display: flex; align-items: center; justify-content: center;">
+        <svg viewBox="0 0 176 100" width="12" style="overflow: visible;" fill="none" stroke="#aab598" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M88 12 L30 12 Q12 12 12 30 L12 70 Q12 88 30 88 L88 88"/>
+          <g transform="translate(76,0)"><path d="M12 12 L12 70 Q12 88 30 88 L70 88 Q88 88 88 70 L88 12"/></g>
+        </svg>
+      </div>
+      <div style="color: #8a8578; font-size: 12px;">16</div>
+    </div>
+  </div>
+
+  <!-- Section: Wordmark lockups -->
+  <div style="text-transform: uppercase; letter-spacing: 0.24em; font-size: 11px; color: #8a8578; margin-bottom: 28px;">Wordmark · Elegant Serif, Sage 4</div>
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px;">
+    <div style="background: #1c1a15; border: 1px solid rgba(170,181,152,0.14); border-radius: 16px; padding: 56px 40px; display: flex; align-items: center; justify-content: center;">
+      <div style="font-family: 'Source Serif 4', serif; font-size: 76px; line-height: 1; font-weight: 400;">For<span style="color: #aab598;">4</span></div>
+    </div>
+    <div style="background: #1c1a15; border: 1px solid rgba(170,181,152,0.14); border-radius: 16px; padding: 40px; display: flex; align-items: center; justify-content: center; gap: 28px;">
+      <svg viewBox="0 0 176 100" width="120" style="overflow: visible; max-width: 40%;" fill="none" stroke="#aab598" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M88 12 L30 12 Q12 12 12 30 L12 70 Q12 88 30 88 L88 88"/>
+        <g transform="translate(76,0)"><path d="M12 12 L12 70 Q12 88 30 88 L70 88 Q88 88 88 70 L88 12"/></g>
+      </svg>
+      <div style="width: 1px; height: 68px; background: rgba(170,181,152,0.2);"></div>
+      <div style="font-family: 'Source Serif 4', serif; font-size: 56px; line-height: 1; font-weight: 400;">For<span style="color: #aab598;">4</span></div>
+    </div>
+  </div>
+
 </div>
 </body>
 </html>
