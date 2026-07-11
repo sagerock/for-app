@@ -196,12 +196,11 @@
   // ---- Screens ------------------------------------------------------------
   const screens = {
     splash: () => `
-      <div class="tap" data-go="lock" style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 40px 56px; animation:forFade 1.6s ease both;">
+      <div class="tap" data-go="lock" style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 40px 56px; animation:forFade 1.2s ease both;">
         <div style="flex:1"></div>
         <div class="serif" style="font-size:78px; font-weight:400; line-height:1; letter-spacing:-0.01em; color:var(--fg-strong);">For<span style="color:var(--accent)">4</span></div>
         <div style="margin-top:22px; font-size:12.5px; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted);">a practice of remembering</div>
         <div style="flex:1"></div>
-        <div style="font-size:13px; letter-spacing:0.14em; color:var(--faint); animation:forPulse 4.5s ease-in-out infinite;">touch to enter</div>
       </div>`,
 
     lock: () => `
@@ -389,7 +388,9 @@
 
     render();
 
-    if (name === "freeze") {
+    if (name === "splash") {
+      timer = setTimeout(() => { go("lock"); }, 1800);   // brief launch, then the call — one way in
+    } else if (name === "freeze") {
       timer = setTimeout(() => { go("rest"); }, 10000);
     } else if (name === "rest") {
       timer = setTimeout(() => { go("splash"); }, 4500);
@@ -444,7 +445,7 @@
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.target.click(); }
   });
 
-  render();
+  go("splash");
 })();
 </script>
 </body>
