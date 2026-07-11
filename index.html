@@ -390,6 +390,8 @@
 
     if (name === "splash") {
       timer = setTimeout(() => { go("lock"); }, 1800);   // brief launch, then the call — one way in
+    } else if (name === "lock") {
+      timer = setTimeout(() => { go("pause"); }, 2800);  // the call flows into the pause on its own — no buttons
     } else if (name === "freeze") {
       timer = setTimeout(() => { go("rest"); }, 10000);
     } else if (name === "rest") {
