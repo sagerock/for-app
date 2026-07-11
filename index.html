@@ -39,6 +39,7 @@
   @keyframes forRise { from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
   @keyframes forHint { 0%,55%{ opacity:0; } 100%{ opacity:0.4; } }
   @keyframes forPulse { 0%,100%{ opacity:0.25; } 50%{ opacity:0.7; } }
+  @keyframes forStep { from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
 
   .tap { cursor: pointer; -webkit-tap-highlight-color: transparent; }
   .act { font-size:13px; letter-spacing:0.16em; text-transform:uppercase; }
@@ -48,12 +49,9 @@
   .dock .pills { display:flex; flex-wrap:wrap; justify-content:center; gap:5px 7px; }
   .dock .pill { cursor:pointer; font-size:12px; letter-spacing:0.03em; padding:6px 12px; border-radius:999px; color:rgba(233,228,214,0.42); transition:all 180ms; user-select:none; }
   .dock .pill[data-active="true"] { color:#e9e4d6; background:rgba(170,181,152,0.18); }
-  .dock .row { display:flex; align-items:center; gap:14px; flex-wrap:wrap; justify-content:center; }
   .dock .seg { display:flex; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:999px; padding:3px; }
   .dock .seg div { cursor:pointer; font-size:12px; letter-spacing:0.05em; padding:7px 16px; border-radius:999px; transition:all 180ms; color:rgba(233,228,214,0.5); user-select:none; }
   .dock .seg div[data-on="true"] { color:#141310; background:#aab598; font-weight:600; }
-  .dock .slider { display:flex; align-items:center; gap:10px; color:rgba(233,228,214,0.5); font-size:12px; letter-spacing:0.04em; }
-  .dock input[type=range] { accent-color:#aab598; width:110px; }
   .dock .note { font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(233,228,214,0.28); }
   textarea:focus { outline: none; }
   textarea::placeholder { color: var(--faint); }
@@ -72,27 +70,17 @@
 
   <div class="dock">
     <div class="pills" id="pills"></div>
-    <div class="row">
-      <div class="seg" id="themeSeg">
-        <div data-theme-set="dark" data-on="true" tabindex="0" role="button">Dark</div>
-        <div data-theme-set="paper" data-on="false" tabindex="0" role="button">Paper</div>
-      </div>
-      <div class="slider">
-        <span>pause</span>
-        <input type="range" id="pauseRange" min="10" max="60" step="5" value="30" aria-label="Pause length in seconds">
-        <span id="pauseLabel">30s</span>
-      </div>
+    <div class="seg" id="themeSeg">
+      <div data-theme-set="dark" data-on="true" tabindex="0" role="button">Dark</div>
+      <div data-theme-set="paper" data-on="false" tabindex="0" role="button">Paper</div>
     </div>
     <div class="note">home wakes you · the study room is where the work is kept</div>
   </div>
 
 <script>
 (function () {
-  // The current member (username = first name + last initial).
   const ME = "Jamie J.";
 
-  // The group's questions and the replies left with them — original, in the spirit of the work.
-  // Replies now carry an author, so the study room lets you "see" who spoke.
   const GROUP = [
     { q: "What woke you today — if anything did?", replies: [
         { t: "Nothing, until the kettle. Then I was here for one second.", by: "Ana R." },
@@ -113,10 +101,12 @@
         { t: "Whose is it, then?", by: "Dae K.", isQ: true } ] },
   ];
 
-  // The pause reaches for all three ways, not only the mind:
-  //   Fakir = body, Monk = feeling, Yogi = stillness/mind.
-  const BODY_CUES  = ["Stand, if you can.", "Feel your feet on the floor.", "Unclench your jaw.", "Let your shoulders drop.", "Change how you're sitting."];
-  const HEART_CUES = ["What's the weather in you right now?", "Where do you feel this in your body?", "Name nothing — just notice.", "What are you carrying, right now?"];
+  // The pause is one guided sequence, the same every time — body, then breath, then mind (mind last).
+  const PAUSE_STEPS = [
+    { eyebrow: "the body",   line: "Shift your position.",   sub: "sit up, or stand — consciously", ms: 6500 },
+    { eyebrow: "the breath", line: "One conscious breath.",  sub: "in… and out",               ms: 11000 },
+    { eyebrow: "the mind",   line: "Observe the beat.",      sub: "just watch what's here",         ms: 6500 },
+  ];
 
   const NAV = [
     { key: "splash",    label: "Splash" },
@@ -131,8 +121,7 @@
     screen: "splash",
     theme: "dark",
     sound: true,
-    pauseSeconds: 30,
-    pausePrompt: null,  // {mode, eyebrow, line}
+    pauseStep: 0,
     callIdxs: [],
     currentIdx: null,
     byoqStage: "open",
@@ -189,11 +178,18 @@
   }
   function ensureFocus() { if (state.currentIdx == null) state.currentIdx = Math.floor(Math.random() * GROUP.length); }
 
-  function rollPausePrompt() {
-    const r = Math.random();
-    if (r < 0.34) state.pausePrompt = { mode: "still", eyebrow: "", line: "stay" };
-    else if (r < 0.67) state.pausePrompt = { mode: "body", eyebrow: "the body", line: pick(BODY_CUES) };
-    else state.pausePrompt = { mode: "heart", eyebrow: "the heart", line: pick(HEART_CUES) };
+  function schedulePauseStep() {
+    const step = PAUSE_STEPS[state.pauseStep];
+    timer = setTimeout(() => {
+      if (state.pauseStep < PAUSE_STEPS.length - 1) {
+        state.pauseStep++;
+        render();
+        schedulePauseStep();
+      } else {
+        chime("close");
+        go("questions");
+      }
+    }, step.ms);
   }
 
   // ---- Screens ------------------------------------------------------------
@@ -210,7 +206,7 @@
     lock: () => `
       <div style="height:100%; display:flex; flex-direction:column; align-items:center; padding:88px 22px 44px; animation:forFade 1.4s ease both;">
         <div class="serif" style="font-weight:300; font-size:76px; line-height:1; color:var(--fg-strong); letter-spacing:-0.02em;">9:41</div>
-        <div style="margin-top:10px; font-size:15px; color:var(--muted);">Friday, July 10</div>
+        <div style="margin-top:10px; font-size:15px; color:var(--muted);">Saturday, July 11</div>
         <div style="flex:1"></div>
         <div class="tap" data-go="pause" style="width:100%; background:var(--card); border:1px solid var(--hair); border-radius:22px; padding:16px 17px; animation:forRise 1s ease both; animation-delay:0.5s; opacity:0;">
           <div style="display:flex; align-items:center; gap:9px; margin-bottom:9px;">
@@ -224,23 +220,28 @@
         <div style="margin-top:22px; font-size:12.5px; letter-spacing:0.06em; color:var(--faint);">it will not always come — you would feel it, then reach for it</div>
       </div>`,
 
+    // The guided pause: body -> breath -> mind, the same every time.
     pause: () => {
-      const p = state.pausePrompt || { mode: "still", eyebrow: "", line: "stay" };
-      const eyebrow = p.eyebrow ? `<div style="font-size:11px; letter-spacing:0.28em; text-transform:uppercase; color:var(--faint); animation:forHint 5s ease both;">${esc(p.eyebrow)}</div>` : "";
-      const line = p.mode === "still"
-        ? `<div style="font-size:13px; letter-spacing:0.24em; text-transform:uppercase; color:var(--faint); animation:forHint 8s ease both;">stay</div>`
-        : `<div class="serif" style="font-size:18px; line-height:1.4; text-align:center; color:var(--muted); animation:forHint 7s ease both;">${esc(p.line)}</div>`;
+      const step = PAUSE_STEPS[state.pauseStep] || PAUSE_STEPS[0];
+      const dots = PAUSE_STEPS.map((_, i) =>
+        `<div style="width:6px; height:6px; border-radius:50%; background:${i === state.pauseStep ? "var(--accent)" : "var(--hair)"};"></div>`).join("");
       return `
-      <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:56px 40px; animation:forFade 2s ease both; overflow:hidden;">
-        <div style="height:44px; display:flex; align-items:flex-end;">${eyebrow}</div>
+      <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:52px 40px; animation:forFade 1s ease both; overflow:hidden;">
+        <div style="height:40px; display:flex; align-items:flex-end;">
+          <div style="font-size:11px; letter-spacing:0.30em; text-transform:uppercase; color:var(--faint); animation:forFade 1s ease both;">${esc(step.eyebrow)}</div>
+        </div>
         <div style="flex:1; display:flex; align-items:center; justify-content:center; width:100%;">
-          <div style="position:relative; width:200px; height:200px; display:flex; align-items:center; justify-content:center;">
-            <div style="position:absolute; width:200px; height:200px; border-radius:50%; border:1px solid var(--accent); animation:forBreathe 12s ease-in-out infinite;"></div>
-            <div style="position:absolute; width:200px; height:200px; border-radius:50%; background:var(--accent-glow); animation:forBreathe 12s ease-in-out infinite;"></div>
+          <div style="position:relative; width:190px; height:190px; display:flex; align-items:center; justify-content:center;">
+            <div style="position:absolute; width:190px; height:190px; border-radius:50%; border:1px solid var(--accent); animation:forBreathe 11s ease-in-out infinite;"></div>
+            <div style="position:absolute; width:190px; height:190px; border-radius:50%; background:var(--accent-glow); animation:forBreathe 11s ease-in-out infinite;"></div>
             <div style="width:7px; height:7px; border-radius:50%; background:var(--accent); opacity:0.85;"></div>
           </div>
         </div>
-        <div style="min-height:56px; display:flex; align-items:center; text-align:center;">${line}</div>
+        <div style="min-height:74px; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center;">
+          <div class="serif" style="font-size:23px; line-height:1.32; color:var(--fg-strong); animation:forStep 1.1s ease both;">${esc(step.line)}</div>
+          <div style="font-size:13px; letter-spacing:0.05em; color:var(--muted); animation:forStep 1.5s ease both;">${esc(step.sub)}</div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:20px;">${dots}</div>
       </div>`;
     },
 
@@ -376,10 +377,10 @@
     state.screen = name;
 
     if (name === "pause") {
-      rollPausePrompt();
+      state.pauseStep = 0;
       render();
       ensureAudio(); chime("open");
-      timer = setTimeout(() => { chime("close"); go("questions"); }, state.pauseSeconds * 1000);
+      schedulePauseStep();
       return;
     }
 
@@ -438,13 +439,6 @@
 
   document.getElementById("themeSeg").addEventListener("keydown", (e) => {
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.target.click(); }
-  });
-
-  const pauseRange = document.getElementById("pauseRange");
-  const pauseLabel = document.getElementById("pauseLabel");
-  pauseRange.addEventListener("input", () => {
-    state.pauseSeconds = Number(pauseRange.value);
-    pauseLabel.textContent = state.pauseSeconds + "s";
   });
 
   render();
