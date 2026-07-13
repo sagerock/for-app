@@ -125,7 +125,8 @@
   const state = {
     screen: "shock",
     theme: "dark",
-    sound: true,
+    // Sounds off (Jamie, Jul 13). If reintroduced later: lower pitch, calm, marimba-like.
+    sound: false,
     pauseStep: 0,
     callIdxs: [],
     currentIdx: null,
@@ -374,7 +375,8 @@
   // Paint the current screen. When `dissolve` is true, the transition fades the
   // screen down to a full black hold (~1s) and back up — a deliberate breath of
   // darkness between phases, not a crossfade. (Jamie's call.)
-  const FADE_OUT_MS = 650, BLACK_HOLD_MS = 1000, FADE_IN_MS = 800;
+  // Jamie's tuning (Jul 13): let the words dissolve longer, hold less black — smoother, less jerky.
+  const FADE_OUT_MS = 1150, BLACK_HOLD_MS = 500, FADE_IN_MS = 800;
   function commitScreen() {
     phone.setAttribute("data-theme", state.theme);
     screen.innerHTML = screens[state.screen]();
