@@ -115,16 +115,15 @@
   ];
 
   const NAV = [
-    { key: "splash",    label: "Splash" },
-    { key: "lock",      label: "The call" },
-    { key: "pause",     label: "The pause" },
+    { key: "shock",     label: "Shock" },
+    { key: "pause",     label: "Pause" },
     { key: "questions", label: "Questions" },
     { key: "study",     label: "Study Room" },
     { key: "about",     label: "About" },
   ];
 
   const state = {
-    screen: "splash",
+    screen: "shock",
     theme: "dark",
     sound: true,
     pauseStep: 0,
@@ -136,6 +135,7 @@
   const phone   = document.getElementById("phone");
   const screen  = document.getElementById("screen");
   const pillsEl = document.getElementById("pills");
+  const dockEl  = document.querySelector(".dock");
   let timer = null;
 
   const clearTimer = () => { if (timer) { clearTimeout(timer); timer = null; } };
@@ -189,7 +189,7 @@
     timer = setTimeout(() => {
       if (state.pauseStep < PAUSE_STEPS.length - 1) {
         state.pauseStep++;
-        render();
+        paintScreen(true);
         schedulePauseStep();
       } else {
         chime("close");
@@ -200,29 +200,13 @@
 
   // ---- Screens ------------------------------------------------------------
   const screens = {
-    splash: () => `
-      <div class="tap" data-go="lock" style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 40px 56px; animation:forFade 1.2s ease both;">
+    // The shock: the app opens, and dissolves on its own into the pause. No tap, no call screen.
+    shock: () => `
+      <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 40px 56px; animation:forFade 1.2s ease both;">
         <div style="flex:1"></div>
         <div class="serif" style="font-size:72px; font-weight:400; line-height:1; letter-spacing:0.005em; color:var(--fg-strong);">Forth</div>
         <div style="margin-top:22px; font-size:12.5px; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted);">a practice of remembering</div>
         <div style="flex:1"></div>
-      </div>`,
-
-    lock: () => `
-      <div style="height:100%; display:flex; flex-direction:column; align-items:center; padding:88px 22px 44px; animation:forFade 1.4s ease both;">
-        <div class="serif" style="font-weight:300; font-size:76px; line-height:1; color:var(--fg-strong); letter-spacing:-0.02em;">9:41</div>
-        <div style="margin-top:10px; font-size:15px; color:var(--muted);">Saturday, July 11</div>
-        <div style="flex:1"></div>
-        <div class="tap" data-go="pause" style="width:100%; background:var(--card); border:1px solid var(--hair); border-radius:22px; padding:16px 17px; animation:forRise 1s ease both; animation-delay:0.5s; opacity:0;">
-          <div style="display:flex; align-items:center; gap:9px; margin-bottom:9px;">
-            <div class="serif" style="width:20px; height:20px; border-radius:6px; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg);">f</div>
-            <div style="font-size:13px; font-weight:600; letter-spacing:0.04em; color:var(--fg); text-transform:uppercase;">Forth</div>
-            <div style="flex:1"></div>
-            <div style="font-size:12.5px; color:var(--muted);">now</div>
-          </div>
-          <div class="serif" style="font-size:21px; line-height:1.3; color:var(--fg-strong);">Wake up. You're here.</div>
-        </div>
-        <div style="margin-top:22px; font-size:12.5px; letter-spacing:0.06em; color:var(--faint);">it will not always come — you would feel it, then reach for it</div>
       </div>`,
 
     // The guided pause: body -> breath -> mind, the same every time.
@@ -379,16 +363,44 @@
   };
 
   // ---- Render & navigation ------------------------------------------------
-  function render() {
+  // The shock and the pause are the "real app" — no prototype chrome over them.
+  function updateDockVisibility() {
+    const bare = state.screen === "shock" || state.screen === "pause";
+    dockEl.style.display = bare ? "none" : "";
+  }
+
+  // Paint the current screen. When `dissolve` is true, the outgoing screen is
+  // held on top as a ghost and cross-faded out over 1.5s — a true dissolve.
+  function paintScreen(dissolve) {
+    let ghost = null;
+    if (dissolve && screen.innerHTML.trim()) {
+      ghost = screen.cloneNode(true);
+      ghost.removeAttribute("id");
+      ghost.style.position = "absolute";
+      ghost.style.inset = "0";
+      ghost.style.zIndex = "6";
+      ghost.style.pointerEvents = "none";
+      ghost.style.opacity = "1";
+      ghost.style.transition = "opacity 1.5s ease";
+      phone.appendChild(ghost);
+    }
     phone.setAttribute("data-theme", state.theme);
     screen.innerHTML = screens[state.screen]();
     renderPills();
+    updateDockVisibility();
+    if (ghost) {
+      void ghost.offsetWidth;                       // commit the start state
+      requestAnimationFrame(() => { ghost.style.opacity = "0"; });
+      setTimeout(() => { if (ghost.parentNode) ghost.parentNode.removeChild(ghost); }, 1650);
+    }
   }
+
+  function render() { paintScreen(false); }
 
   function go(name) {
     clearTimer();
 
-    if (name === "splash" || name === "lock" || name === "pause") state.callIdxs = [];
+    if (name === "shock" || name === "pause") state.callIdxs = [];
     if (name === "questions" && state.callIdxs.length === 0) pullQuestion();
     if (name === "study" || name === "respond" || name === "byoq") ensureFocus();
     if (name === "byoq") state.byoqStage = "open";
@@ -397,22 +409,20 @@
 
     if (name === "pause") {
       state.pauseStep = 0;
-      render();
+      paintScreen(true);
       ensureAudio(); chime("open");
       schedulePauseStep();
       return;
     }
 
-    render();
+    paintScreen(true);
 
-    if (name === "splash") {
-      timer = setTimeout(() => { go("lock"); }, 3800);   // brief launch, then the call — one way in (Jamie: +2s)
-    } else if (name === "lock") {
-      timer = setTimeout(() => { go("pause"); }, 2800);  // the call flows into the pause on its own — no buttons
+    if (name === "shock") {
+      timer = setTimeout(() => { go("pause"); }, 3800);  // the shock dissolves straight into the pause — no call, no button
     } else if (name === "freeze") {
       timer = setTimeout(() => { go("rest"); }, 10000);
     } else if (name === "rest") {
-      timer = setTimeout(() => { go("splash"); }, 4500);
+      timer = setTimeout(() => { go("shock"); }, 4500);
     }
   }
 
@@ -464,7 +474,7 @@
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.target.click(); }
   });
 
-  go("splash");
+  go("shock");
 })();
 </script>
 </body>
