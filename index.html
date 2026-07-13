@@ -185,15 +185,70 @@
   }
   function ensureFocus() { if (state.currentIdx == null) state.currentIdx = Math.floor(Math.random() * GROUP.length); }
 
+  // ---- Pause building blocks ----------------------------------------------
+  const dotsHTML = (active) => PAUSE_STEPS.map((_, i) =>
+    `<div style="width:6px; height:6px; border-radius:50%; background:${i === active ? "var(--accent)" : "var(--hair)"};"></div>`).join("");
+
+  const pauseTextHTML = (step) =>
+    `<div class="serif" style="font-size:24px; line-height:1.3; color:var(--fg-strong);">${esc(step.head)}</div>
+     <div style="font-size:13.5px; letter-spacing:0.04em; color:var(--muted);">${esc(step.sub)}</div>`;
+
+  // Body: a single stick swaying like a metronome, inside a faint ring.
+  const bodyVisualHTML = () => `
+    <div style="position:relative; width:190px; height:190px; display:flex; align-items:center; justify-content:center;">
+      <div style="position:absolute; width:190px; height:190px; border-radius:50%; border:1px solid var(--accent); opacity:0.28;"></div>
+      <div style="position:absolute; bottom:34px; width:1px; height:96px; background:var(--accent-line); transform-origin:bottom center; animation:forTilt 5.2s ease-in-out infinite;">
+        <div style="position:absolute; top:-6px; left:50%; transform:translateX(-50%); width:10px; height:10px; border-radius:50%; background:var(--accent); opacity:0.85;"></div>
+      </div>
+    </div>`;
+
+  // Breath: the ring comes alive and breathes, with in/out guidance at its center.
+  const breathVisualHTML = () => `
+    <div style="position:relative; width:190px; height:190px; display:flex; align-items:center; justify-content:center;">
+      <div style="position:absolute; width:190px; height:190px; border-radius:50%; border:1px solid var(--accent); animation:forBreathe 11s ease-in-out infinite;"></div>
+      <div style="position:absolute; width:190px; height:190px; border-radius:50%; background:var(--accent-glow); animation:forBreathe 11s ease-in-out infinite;"></div>
+      <div id="breathWords" style="position:relative; width:72px; height:18px; transition:opacity 1s ease;">
+        <span style="position:absolute; inset:0; text-align:center; font-size:12px; letter-spacing:0.22em; color:var(--fg-strong); animation:forInWord 11s ease-in-out infinite;">in</span>
+        <span style="position:absolute; inset:0; text-align:center; font-size:12px; letter-spacing:0.22em; color:var(--fg-strong); animation:forOutWord 11s ease-in-out infinite;">out</span>
+      </div>
+    </div>`;
+
+  // Advance one pause step in place: the text dissolves and swaps, the image stays.
+  function advancePauseStep() {
+    const prevKind = PAUSE_STEPS[state.pauseStep].kind;
+    state.pauseStep++;
+    const step = PAUSE_STEPS[state.pauseStep];
+    const textEl = document.getElementById("pauseText");
+    const visualEl = document.getElementById("pauseVisual");
+    const dotsEl = document.getElementById("pauseDots");
+
+    if (dotsEl) dotsEl.innerHTML = dotsHTML(state.pauseStep);
+    if (textEl) {
+      textEl.style.opacity = "0";
+      setTimeout(() => { textEl.innerHTML = pauseTextHTML(step); textEl.style.opacity = "1"; }, 600);
+    }
+
+    if (prevKind === "body" && step.kind === "breath") {
+      // The metronome becomes the breath — cross-fade the image (no black); breath begins.
+      if (visualEl) {
+        visualEl.style.opacity = "0";
+        setTimeout(() => { visualEl.innerHTML = breathVisualHTML(); visualEl.style.opacity = "1"; }, 600);
+      }
+    } else if (prevKind === "breath" && step.kind === "mind") {
+      // Critical: the breath must NOT stop, or you hold your breath. Keep the same
+      // breathing circle running; only retire the in/out words so the mind feels quieter.
+      const words = document.getElementById("breathWords");
+      if (words) { words.style.opacity = "0"; setTimeout(() => { if (words.parentNode) words.remove(); }, 1000); }
+    }
+  }
+
   function schedulePauseStep() {
     const step = PAUSE_STEPS[state.pauseStep];
     timer = setTimeout(() => {
       if (state.pauseStep < PAUSE_STEPS.length - 1) {
-        state.pauseStep++;
-        paintScreen(true);
+        advancePauseStep();
         schedulePauseStep();
       } else {
-        chime("close");
         go("questions");
       }
     }, step.ms);
@@ -212,42 +267,19 @@
         <div style="font-size:12.5px; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted);">a practice of remembering</div>
       </div>`,
 
-    // The guided pause: body -> breath -> mind, the same every time.
+    // The guided pause: body -> breath -> mind. The image runs CONTINUOUSLY the
+    // whole way through — only the text dissolves between steps, and the breath
+    // never stops (stopping it made Jamie hold his breath). Steps advance in
+    // place via advancePauseStep(), not by re-rendering the screen.
     pause: () => {
       const step = PAUSE_STEPS[state.pauseStep] || PAUSE_STEPS[0];
-      const dots = PAUSE_STEPS.map((_, i) =>
-        `<div style="width:6px; height:6px; border-radius:50%; background:${i === state.pauseStep ? "var(--accent)" : "var(--hair)"};"></div>`).join("");
-      const bodyVisual = `
-        <div style="position:relative; width:190px; height:190px; display:flex; align-items:flex-end; justify-content:center; padding-bottom:26px; animation:forFade 1.6s ease both;">
-          <div style="position:absolute; bottom:26px; width:118px; height:1px; background:var(--hair);"></div>
-          <div style="width:1px; height:104px; background:var(--accent-line); transform-origin:bottom center; animation:forTilt 5.2s ease-in-out infinite; position:relative;">
-            <div style="position:absolute; top:-6px; left:50%; transform:translateX(-50%); width:10px; height:10px; border-radius:50%; background:var(--accent); opacity:0.85;"></div>
-          </div>
-        </div>`;
-      const breathVisual = `
-        <div style="position:relative; width:190px; height:190px; display:flex; align-items:center; justify-content:center;">
-          <div style="position:absolute; width:190px; height:190px; border-radius:50%; border:1px solid var(--accent); animation:forBreathe 11s ease-in-out infinite;"></div>
-          <div style="position:absolute; width:190px; height:190px; border-radius:50%; background:var(--accent-glow); animation:forBreathe 11s ease-in-out infinite;"></div>
-          <div style="position:relative; width:72px; height:18px;">
-            <span style="position:absolute; inset:0; text-align:center; font-size:12px; letter-spacing:0.22em; color:var(--fg-strong); animation:forInWord 11s ease-in-out infinite;">in</span>
-            <span style="position:absolute; inset:0; text-align:center; font-size:12px; letter-spacing:0.22em; color:var(--fg-strong); animation:forOutWord 11s ease-in-out infinite;">out</span>
-          </div>
-        </div>`;
-      const mindVisual = `
-        <div style="position:relative; width:190px; height:190px; display:flex; align-items:center; justify-content:center; animation:forFade 2.4s ease both;">
-          <div style="position:absolute; width:150px; height:150px; border-radius:50%; border:1px solid var(--accent); opacity:0.45;"></div>
-          <div style="width:7px; height:7px; border-radius:50%; background:var(--accent); opacity:0.7;"></div>
-        </div>`;
-      const circle = step.kind === "body" ? bodyVisual : step.kind === "breath" ? breathVisual : mindVisual;
+      const visual = step.kind === "body" ? bodyVisualHTML() : breathVisualHTML();
       return `
-      <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:52px 40px; animation:forFade 1s ease both; overflow:hidden;">
+      <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:52px 40px; overflow:hidden;">
         <div style="height:40px;"></div>
-        <div style="flex:1; display:flex; align-items:center; justify-content:center; width:100%;">${circle}</div>
-        <div style="min-height:78px; display:flex; flex-direction:column; align-items:center; gap:9px; text-align:center;">
-          <div class="serif" style="font-size:24px; line-height:1.3; color:var(--fg-strong); animation:forStep 1.1s ease both;">${esc(step.head)}</div>
-          <div style="font-size:13.5px; letter-spacing:0.04em; color:var(--muted); animation:forStep 1.6s ease both;">${esc(step.sub)}</div>
-        </div>
-        <div style="display:flex; gap:8px; margin-top:22px;">${dots}</div>
+        <div id="pauseVisual" style="flex:1; display:flex; align-items:center; justify-content:center; width:100%; transition:opacity 0.6s ease;">${visual}</div>
+        <div id="pauseText" style="min-height:78px; display:flex; flex-direction:column; align-items:center; gap:9px; text-align:center; transition:opacity 0.6s ease;">${pauseTextHTML(step)}</div>
+        <div id="pauseDots" style="display:flex; gap:8px; margin-top:22px;">${dotsHTML(state.pauseStep)}</div>
       </div>`;
     },
 
