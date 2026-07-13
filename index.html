@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#141310">
-<title>For4 — a practice of remembering</title>
+<title>Forth — a practice of remembering</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -40,6 +40,11 @@
   @keyframes forHint { 0%,55%{ opacity:0; } 100%{ opacity:0.4; } }
   @keyframes forPulse { 0%,100%{ opacity:0.25; } 50%{ opacity:0.7; } }
   @keyframes forStep { from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+  /* Body step: an upright form that gently shifts its weight — distinct from the breath */
+  @keyframes forTilt { 0%,100%{ transform:rotate(-4.5deg); } 50%{ transform:rotate(4.5deg); } }
+  /* Breath step: "in" while the circle expands (0–50%), "out" while it contracts (50–100%) */
+  @keyframes forInWord  { 0%{opacity:0;} 8%{opacity:0.85;} 42%{opacity:0.85;} 50%,100%{opacity:0;} }
+  @keyframes forOutWord { 0%,50%{opacity:0;} 58%{opacity:0.85;} 92%{opacity:0.85;} 100%{opacity:0;} }
 
   .tap { cursor: pointer; -webkit-tap-highlight-color: transparent; }
   .act { font-size:13px; letter-spacing:0.16em; text-transform:uppercase; }
@@ -101,12 +106,12 @@
         { t: "Whose is it, then?", by: "Dae K.", isQ: true } ] },
   ];
 
-  // The pause is one guided sequence, the same every time — body, then soul, then mind (mind last).
-  // On the mind step the picture goes still: nothing left to watch, just a space prepared.
+  // The pause is one guided sequence, the same every time — body, then breath, then mind (mind last).
+  // Each step has its own visual: the body shifts, the breath opens and closes, the mind goes still.
   const PAUSE_STEPS = [
-    { head: "Wake your body", sub: "consciously shift your position", ms: 8500,  still: false },
-    { head: "Wake your soul", sub: "breathe",                         ms: 11000, still: false },
-    { head: "Wake your mind", sub: "prepare a space in your mind",    ms: 13000, still: true  },
+    { head: "Wake your body", sub: "consciously shift your position", ms: 8500,  kind: "body"   },
+    { head: "Breathe deeply", sub: "feel your emotion",              ms: 11000, kind: "breath" },
+    { head: "Open your mind", sub: "prepare space without thought",  ms: 13000, kind: "mind"   },
   ];
 
   const NAV = [
@@ -198,7 +203,7 @@
     splash: () => `
       <div class="tap" data-go="lock" style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 40px 56px; animation:forFade 1.2s ease both;">
         <div style="flex:1"></div>
-        <div class="serif" style="font-size:78px; font-weight:400; line-height:1; letter-spacing:-0.01em; color:var(--fg-strong);">For<span style="color:var(--accent)">4</span></div>
+        <div class="serif" style="font-size:72px; font-weight:400; line-height:1; letter-spacing:0.005em; color:var(--fg-strong);">Forth</div>
         <div style="margin-top:22px; font-size:12.5px; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted);">a practice of remembering</div>
         <div style="flex:1"></div>
       </div>`,
@@ -211,7 +216,7 @@
         <div class="tap" data-go="pause" style="width:100%; background:var(--card); border:1px solid var(--hair); border-radius:22px; padding:16px 17px; animation:forRise 1s ease both; animation-delay:0.5s; opacity:0;">
           <div style="display:flex; align-items:center; gap:9px; margin-bottom:9px;">
             <div class="serif" style="width:20px; height:20px; border-radius:6px; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; color:var(--bg);">f</div>
-            <div style="font-size:13px; font-weight:600; letter-spacing:0.04em; color:var(--fg); text-transform:uppercase;">For4</div>
+            <div style="font-size:13px; font-weight:600; letter-spacing:0.04em; color:var(--fg); text-transform:uppercase;">Forth</div>
             <div style="flex:1"></div>
             <div style="font-size:12.5px; color:var(--muted);">now</div>
           </div>
@@ -225,16 +230,28 @@
       const step = PAUSE_STEPS[state.pauseStep] || PAUSE_STEPS[0];
       const dots = PAUSE_STEPS.map((_, i) =>
         `<div style="width:6px; height:6px; border-radius:50%; background:${i === state.pauseStep ? "var(--accent)" : "var(--hair)"};"></div>`).join("");
-      const circle = step.still
-        ? `<div style="position:relative; width:190px; height:190px; display:flex; align-items:center; justify-content:center; animation:forFade 2.4s ease both;">
-             <div style="position:absolute; width:150px; height:150px; border-radius:50%; border:1px solid var(--accent); opacity:0.45;"></div>
-             <div style="width:7px; height:7px; border-radius:50%; background:var(--accent); opacity:0.7;"></div>
-           </div>`
-        : `<div style="position:relative; width:190px; height:190px; display:flex; align-items:center; justify-content:center;">
-             <div style="position:absolute; width:190px; height:190px; border-radius:50%; border:1px solid var(--accent); animation:forBreathe 11s ease-in-out infinite;"></div>
-             <div style="position:absolute; width:190px; height:190px; border-radius:50%; background:var(--accent-glow); animation:forBreathe 11s ease-in-out infinite;"></div>
-             <div style="width:7px; height:7px; border-radius:50%; background:var(--accent); opacity:0.85;"></div>
-           </div>`;
+      const bodyVisual = `
+        <div style="position:relative; width:190px; height:190px; display:flex; align-items:flex-end; justify-content:center; padding-bottom:26px; animation:forFade 1.6s ease both;">
+          <div style="position:absolute; bottom:26px; width:118px; height:1px; background:var(--hair);"></div>
+          <div style="width:1px; height:104px; background:var(--accent-line); transform-origin:bottom center; animation:forTilt 5.2s ease-in-out infinite; position:relative;">
+            <div style="position:absolute; top:-6px; left:50%; transform:translateX(-50%); width:10px; height:10px; border-radius:50%; background:var(--accent); opacity:0.85;"></div>
+          </div>
+        </div>`;
+      const breathVisual = `
+        <div style="position:relative; width:190px; height:190px; display:flex; align-items:center; justify-content:center;">
+          <div style="position:absolute; width:190px; height:190px; border-radius:50%; border:1px solid var(--accent); animation:forBreathe 11s ease-in-out infinite;"></div>
+          <div style="position:absolute; width:190px; height:190px; border-radius:50%; background:var(--accent-glow); animation:forBreathe 11s ease-in-out infinite;"></div>
+          <div style="position:relative; width:72px; height:18px;">
+            <span style="position:absolute; inset:0; text-align:center; font-size:12px; letter-spacing:0.22em; color:var(--fg-strong); animation:forInWord 11s ease-in-out infinite;">in</span>
+            <span style="position:absolute; inset:0; text-align:center; font-size:12px; letter-spacing:0.22em; color:var(--fg-strong); animation:forOutWord 11s ease-in-out infinite;">out</span>
+          </div>
+        </div>`;
+      const mindVisual = `
+        <div style="position:relative; width:190px; height:190px; display:flex; align-items:center; justify-content:center; animation:forFade 2.4s ease both;">
+          <div style="position:absolute; width:150px; height:150px; border-radius:50%; border:1px solid var(--accent); opacity:0.45;"></div>
+          <div style="width:7px; height:7px; border-radius:50%; background:var(--accent); opacity:0.7;"></div>
+        </div>`;
+      const circle = step.kind === "body" ? bodyVisual : step.kind === "breath" ? breathVisual : mindVisual;
       return `
       <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:52px 40px; animation:forFade 1s ease both; overflow:hidden;">
         <div style="height:40px;"></div>
@@ -389,7 +406,7 @@
     render();
 
     if (name === "splash") {
-      timer = setTimeout(() => { go("lock"); }, 1800);   // brief launch, then the call — one way in
+      timer = setTimeout(() => { go("lock"); }, 3800);   // brief launch, then the call — one way in (Jamie: +2s)
     } else if (name === "lock") {
       timer = setTimeout(() => { go("pause"); }, 2800);  // the call flows into the pause on its own — no buttons
     } else if (name === "freeze") {
