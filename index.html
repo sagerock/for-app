@@ -200,13 +200,15 @@
 
   // ---- Screens ------------------------------------------------------------
   const screens = {
-    // The shock: the app opens, and dissolves on its own into the pause. No tap, no call screen.
+    // The shock: the app opens with the wake line, then dissolves on its own into
+    // the pause. No tap, no call screen, no clock.
     shock: () => `
       <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 40px 56px; animation:forFade 1.2s ease both;">
         <div style="flex:1"></div>
         <div class="serif" style="font-size:72px; font-weight:400; line-height:1; letter-spacing:0.005em; color:var(--fg-strong);">Forth</div>
-        <div style="margin-top:22px; font-size:12.5px; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted);">a practice of remembering</div>
+        <div class="serif" style="margin-top:26px; font-size:22px; line-height:1.35; color:var(--fg); animation:forRise 1.8s ease both;">Wake up. You're here.</div>
         <div style="flex:1"></div>
+        <div style="font-size:12.5px; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted);">a practice of remembering</div>
       </div>`,
 
     // The guided pause: body -> breath -> mind, the same every time.
@@ -369,30 +371,34 @@
     dockEl.style.display = bare ? "none" : "";
   }
 
-  // Paint the current screen. When `dissolve` is true, the outgoing screen is
-  // held on top as a ghost and cross-faded out over 1.5s — a true dissolve.
-  function paintScreen(dissolve) {
-    let ghost = null;
-    if (dissolve && screen.innerHTML.trim()) {
-      ghost = screen.cloneNode(true);
-      ghost.removeAttribute("id");
-      ghost.style.position = "absolute";
-      ghost.style.inset = "0";
-      ghost.style.zIndex = "6";
-      ghost.style.pointerEvents = "none";
-      ghost.style.opacity = "1";
-      ghost.style.transition = "opacity 1.5s ease";
-      phone.appendChild(ghost);
-    }
+  // Paint the current screen. When `dissolve` is true, the transition fades the
+  // screen down to a full black hold (~1s) and back up — a deliberate breath of
+  // darkness between phases, not a crossfade. (Jamie's call.)
+  const FADE_OUT_MS = 650, BLACK_HOLD_MS = 1000, FADE_IN_MS = 800;
+  function commitScreen() {
     phone.setAttribute("data-theme", state.theme);
     screen.innerHTML = screens[state.screen]();
     renderPills();
     updateDockVisibility();
-    if (ghost) {
-      void ghost.offsetWidth;                       // commit the start state
-      requestAnimationFrame(() => { ghost.style.opacity = "0"; });
-      setTimeout(() => { if (ghost.parentNode) ghost.parentNode.removeChild(ghost); }, 1650);
-    }
+  }
+  function paintScreen(dissolve) {
+    if (!dissolve || !screen.innerHTML.trim()) { commitScreen(); return; }
+
+    const veil = document.createElement("div");
+    veil.style.cssText = "position:absolute; inset:0; background:#000; z-index:8; " +
+      "opacity:0; pointer-events:none; transition:opacity " + FADE_OUT_MS + "ms ease;";
+    phone.appendChild(veil);
+    void veil.offsetWidth;                                   // commit start state
+    requestAnimationFrame(() => { veil.style.opacity = "1"; });  // fade down to black
+
+    setTimeout(() => {
+      commitScreen();                                        // swap under full black
+      setTimeout(() => {
+        veil.style.transition = "opacity " + FADE_IN_MS + "ms ease";
+        veil.style.opacity = "0";                            // fade the new screen up
+        setTimeout(() => { if (veil.parentNode) veil.parentNode.removeChild(veil); }, FADE_IN_MS + 60);
+      }, BLACK_HOLD_MS);
+    }, FADE_OUT_MS);
   }
 
   function render() { paintScreen(false); }
