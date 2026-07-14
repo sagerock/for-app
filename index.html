@@ -40,6 +40,8 @@
   @keyframes forHint { 0%,55%{ opacity:0; } 100%{ opacity:0.4; } }
   @keyframes forPulse { 0%,100%{ opacity:0.25; } 50%{ opacity:0.7; } }
   @keyframes forStep { from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+  /* Shock: "Now" blooms slowly — still arriving for the full five seconds */
+  @keyframes forNow { from{ opacity:0; transform:scale(0.86); } to{ opacity:1; transform:scale(1); } }
   /* Body step: an upright form that gently shifts its weight — distinct from the breath */
   @keyframes forTilt { 0%,100%{ transform:rotate(-4.5deg); } 50%{ transform:rotate(4.5deg); } }
   /* Breath step: "in" while the circle expands (0–50%), "out" while it contracts (50–100%) */
@@ -108,6 +110,7 @@
 
   // The pause is one guided sequence, the same every time — body, then breath, then mind (mind last).
   // Each step has its own visual: the body shifts, the breath opens and closes, the mind goes still.
+  // It ends on a still dot, then two doors: forth (leave) or question (stay). The user decides.
   const PAUSE_STEPS = [
     { head: "Wake your body", sub: "consciously shift your position", ms: 8500,  kind: "body"   },
     { head: "Breathe deeply", sub: "feel your emotion",              ms: 11000, kind: "breath" },
@@ -249,20 +252,20 @@
         advancePauseStep();
         schedulePauseStep();
       } else {
-        go("questions");
+        go("still");
       }
     }, step.ms);
   }
 
   // ---- Screens ------------------------------------------------------------
   const screens = {
-    // The shock: the app opens with the wake line, then dissolves on its own into
-    // the pause. No tap, no call screen, no clock.
+    // The shock: the app opens on one word — "Now" — blooming slowly for ~5s,
+    // then dissolves on its own into the pause. No tap, no call screen, no clock.
     shock: () => `
       <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 40px 56px; animation:forFade 1.2s ease both;">
         <div style="flex:1"></div>
         <div class="serif" style="font-size:72px; font-weight:400; line-height:1; letter-spacing:0.005em; color:var(--fg-strong);">Forth</div>
-        <div class="serif" style="margin-top:26px; font-size:22px; line-height:1.35; color:var(--fg); animation:forRise 1.8s ease both;">Wake up. You're here.</div>
+        <div class="serif" style="margin-top:34px; font-size:64px; font-weight:400; line-height:1; color:var(--fg-strong); animation:forNow 5.2s cubic-bezier(0.22,0.6,0.36,1) both;">Now</div>
         <div style="flex:1"></div>
         <div style="font-size:12.5px; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted);">a practice of remembering</div>
       </div>`,
@@ -352,9 +355,39 @@
         <div style="margin-top:32px; font-size:12px; letter-spacing:0.26em; text-transform:uppercase; color:var(--faint); animation:forHint 5s ease both;">held</div>
       </div>`,
 
+    // After the pause: a still point — just the dot, quietly alive, ~5s —
+    // before the two doors appear.
+    still: () => `
+      <div style="height:100%; display:flex; align-items:center; justify-content:center; padding:64px; animation:forFade 1.4s ease both;">
+        <div style="width:9px; height:9px; border-radius:50%; background:var(--accent); opacity:0.8; animation:forBreathe 6s ease-in-out infinite;"></div>
+      </div>`,
+
+    // The user decides what the moment becomes: leave, or stay for the group's
+    // question. Two doors, no default, no push — leaving is offered first.
+    choice: () => `
+      <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 40px; animation:forFade 2.4s ease both;">
+        <div style="flex:1"></div>
+        <div class="tap" data-go="rest" style="display:flex; flex-direction:column; align-items:center; gap:8px; padding:18px 48px; animation:forRise 2.2s ease 0.4s both;">
+          <div class="serif" style="font-size:27px; color:var(--fg-strong);">forth</div>
+          <div style="font-size:11.5px; letter-spacing:0.22em; text-transform:uppercase; color:var(--faint);">leave</div>
+        </div>
+        <div style="height:40px;"></div>
+        <div class="tap" data-go="questions" style="display:flex; flex-direction:column; align-items:center; gap:8px; padding:18px 48px; animation:forRise 2.2s ease 1.3s both;">
+          <div class="serif" style="font-size:27px; color:var(--fg-strong);">question</div>
+          <div style="font-size:11.5px; letter-spacing:0.22em; text-transform:uppercase; color:var(--faint);">stay</div>
+        </div>
+        <div style="flex:1"></div>
+      </div>`,
+
+    // The end card. Leaving is blessed, not instructed — body, emotion, mind,
+    // in that order (Jamie's language, Jul 14).
     rest: () => `
-      <div style="height:100%; display:flex; align-items:center; justify-content:center; padding:64px; animation:forFade 2.2s ease both;">
-        <div class="serif" style="font-style:italic; font-size:19px; color:var(--faint);">put it down</div>
+      <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:64px 40px; animation:forFade 2.2s ease both;">
+        <div class="serif" style="font-size:21px; line-height:1.6; color:var(--fg);">
+          <div style="animation:forRise 2.4s ease 0.3s both;">May you be well</div>
+          <div style="margin-top:18px; animation:forRise 2.4s ease 1.7s both;">May you have love</div>
+          <div style="margin-top:18px; animation:forRise 2.4s ease 3.1s both;">May you have peace in your life</div>
+        </div>
       </div>`,
 
     about: () => `
@@ -400,7 +433,7 @@
   // ---- Render & navigation ------------------------------------------------
   // The shock and the pause are the "real app" — no prototype chrome over them.
   function updateDockVisibility() {
-    const bare = state.screen === "shock" || state.screen === "pause";
+    const bare = ["shock", "pause", "still", "choice"].includes(state.screen);
     dockEl.style.display = bare ? "none" : "";
   }
 
@@ -458,17 +491,20 @@
     paintScreen(true);
 
     if (name === "shock") {
-      timer = setTimeout(() => { go("pause"); }, 3800);  // the shock dissolves straight into the pause — no call, no button
+      timer = setTimeout(() => { go("pause"); }, 5800);  // "Now" gets its five seconds, then dissolves straight into the pause
+    } else if (name === "still") {
+      timer = setTimeout(() => { go("choice"); }, 6500); // ~5s of visible stillness once the dissolve clears, then the two doors
     } else if (name === "freeze") {
       timer = setTimeout(() => { go("rest"); }, 10000);
     } else if (name === "rest") {
-      timer = setTimeout(() => { go("shock"); }, 4500);
+      timer = setTimeout(() => { go("shock"); }, 14000); // long enough to receive all three lines
     }
   }
 
   function renderPills() {
     pillsEl.innerHTML = NAV.map(n => {
       const active = state.screen === n.key ||
+        (n.key === "pause" && ["still", "choice"].includes(state.screen)) ||
         (n.key === "questions" && state.screen === "rest") ||
         (n.key === "study" && ["respond", "freeze", "byoq"].includes(state.screen));
       return `<div class="pill" data-active="${active}" data-go="${n.key}">${n.label}</div>`;
