@@ -34,6 +34,14 @@
   .screen { position: absolute; inset: 0; background: var(--bg); color: var(--fg); display: flex; flex-direction: column; font-family: 'Hanken Grotesk', sans-serif; }
   .serif { font-family: 'Source Serif 4', Georgia, serif; }
 
+  /* The wordmark is a constant: pinned at top-center, present on every screen,
+     and it sits ABOVE the transition veil (z-index 9 > 8) so it never fades.
+     While everything else dissolves to black and back, "Forth" holds — the
+     thread that stitches the phases together. (Jamie, Jul 14.) */
+  .brand { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 22px); left: 50%; transform: translateX(-50%);
+    z-index: 9; font-family: 'Source Serif 4', Georgia, serif; font-weight: 400; font-size: 19px;
+    letter-spacing: 0.02em; color: var(--muted); pointer-events: none; }
+
   @keyframes forBreathe { 0%,100%{ transform:scale(0.62); opacity:0.45; } 50%{ transform:scale(1.04); opacity:0.92; } }
   @keyframes forFade { from{ opacity:0; } to{ opacity:1; } }
   @keyframes forRise { from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:none; } }
@@ -73,6 +81,7 @@
 
   <div class="phone" id="phone" data-theme="dark">
     <div class="screen" id="screen"></div>
+    <div class="brand serif" id="brand">Forth</div>
   </div>
 
   <div class="dock">
@@ -260,12 +269,13 @@
   // ---- Screens ------------------------------------------------------------
   const screens = {
     // The shock: the app opens on one word — "Now" — blooming slowly for ~5s,
-    // then dissolves on its own into the pause. No tap, no call screen, no clock.
+    // then dissolves on its own into the pause. The "Forth" wordmark lives in the
+    // persistent top brand now (see .brand), so the screen is just Now. No tap,
+    // no call screen, no clock.
     shock: () => `
       <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 40px 56px; animation:forFade 1.2s ease both;">
         <div style="flex:1"></div>
-        <div class="serif" style="font-size:72px; font-weight:400; line-height:1; letter-spacing:0.005em; color:var(--fg-strong);">Forth</div>
-        <div class="serif" style="margin-top:34px; font-size:64px; font-weight:400; line-height:1; color:var(--fg-strong); animation:forNow 5.2s cubic-bezier(0.22,0.6,0.36,1) both;">Now</div>
+        <div class="serif" style="font-size:64px; font-weight:400; line-height:1; color:var(--fg-strong); animation:forNow 5.2s cubic-bezier(0.22,0.6,0.36,1) both;">Now</div>
         <div style="flex:1"></div>
         <div style="font-size:12.5px; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted);">a practice of remembering</div>
       </div>`,
