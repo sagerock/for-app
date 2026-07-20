@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#141310">
 <title>Forth — self-remembering</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/forth-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -12,14 +14,13 @@
   * { box-sizing: border-box; }
   html, body { margin: 0; height: 100%; background: #211f1a;
     font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; -webkit-font-smoothing: antialiased; }
-  body { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100dvh; gap: 22px; padding: 24px 16px 20px; }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100dvh; padding: 24px 16px; }
 
-  .phone { position: relative; width: min(100%, 402px); height: min(calc(100dvh - 120px), 874px);
+  .phone { position: relative; width: min(100%, 402px); height: min(calc(100dvh - 48px), 874px);
     border-radius: 40px; overflow: hidden; box-shadow: 0 30px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05); background: var(--bg); }
   @media (max-width: 460px) {
-    body { padding: 0; gap: 0; }
+    body { padding: 0; }
     .phone { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
-    .dock { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(20,19,16,0.92); backdrop-filter: blur(8px); padding: 9px 8px 12px; }
   }
 
   .phone[data-theme="dark"] { --bg:#141310; --card:rgba(230,224,208,0.06);
@@ -71,17 +72,9 @@
   .act { font-size:13px; letter-spacing:0.16em; text-transform:uppercase; }
   .replies-link { font-size:13px; letter-spacing:0.06em; color:var(--accent); border-bottom:1px solid var(--accent-line); padding-bottom:2px; }
 
-  .dock { display: flex; flex-direction: column; align-items: center; gap: 12px; width: min(100%, 460px); }
-  .dock .pills { display:flex; flex-wrap:wrap; justify-content:center; gap:5px 7px; }
-  .dock .pill { cursor:pointer; font-size:12px; letter-spacing:0.03em; padding:6px 12px; border-radius:999px; color:rgba(233,228,214,0.42); transition:all 180ms; user-select:none; }
-  .dock .pill[data-active="true"] { color:#e9e4d6; background:rgba(170,181,152,0.18); }
-  .dock .seg { display:flex; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:999px; padding:3px; }
-  .dock .seg div { cursor:pointer; font-size:12px; letter-spacing:0.05em; padding:7px 16px; border-radius:999px; transition:all 180ms; color:rgba(233,228,214,0.5); user-select:none; }
-  .dock .seg div[data-on="true"] { color:#141310; background:#aab598; font-weight:600; }
-  .dock .note { font-size:11px; letter-spacing:0.1em; text-transform:uppercase; color:rgba(233,228,214,0.28); }
-  textarea:focus { outline: none; }
-  textarea::placeholder { color: var(--faint); }
-  .tap:focus-visible, [data-theme-set]:focus-visible { outline: 2px solid var(--accent, #aab598); outline-offset: 3px; border-radius: 8px; }
+  textarea:focus, input:focus { outline: none; }
+  textarea::placeholder, input::placeholder { color: var(--faint); }
+  .tap:focus-visible { outline: 2px solid var(--accent, #aab598); outline-offset: 3px; border-radius: 8px; }
 
   @media (prefers-reduced-motion: reduce) {
     * { animation-duration: 1ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; }
@@ -95,39 +88,8 @@
     <div class="brand serif" id="brand">For<span class="ord">th</span></div>
   </div>
 
-  <div class="dock">
-    <div class="pills" id="pills"></div>
-    <div class="seg" id="themeSeg">
-      <div data-theme-set="dark" data-on="true" tabindex="0" role="button">Dark</div>
-      <div data-theme-set="paper" data-on="false" tabindex="0" role="button">Paper</div>
-    </div>
-    <div class="note">home wakes you · the study room is where the work is kept</div>
-  </div>
-
 <script>
 (function () {
-  const ME = "Jamie J.";
-
-  const GROUP = [
-    { q: "What woke you today — if anything did?", replies: [
-        { t: "Nothing, until the kettle. Then I was here for one second.", by: "Ana R." },
-        { t: "Is being woken the same as waking?", by: "Marcus T.", isQ: true } ] },
-    { q: "Where do you go when you disappear?", replies: [] },
-    { q: "What are you pretending not to know?", replies: [
-        { t: "That I heard it the first time.", by: "Dae K." },
-        { t: "That the pretending is the comfortable part.", by: "Ruth M." },
-        { t: "What would change if I admitted it?", by: "Ana R.", isQ: true } ] },
-    { q: "Who is asking?", replies: [
-        { t: "I keep answering before I find out.", by: "Sage L." } ] },
-    { q: "When did you last feel your own weight?", replies: [] },
-    { q: "What runs you when no one is watching?", replies: [
-        { t: "The next thing. Always the next thing.", by: "Marcus T." } ] },
-    { q: "What would you notice if you moved half as fast?", replies: [] },
-    { q: "What are you still carrying that was never yours?", replies: [
-        { t: "A voice that isn't mine, telling me to hurry.", by: "Ruth M." },
-        { t: "Whose is it, then?", by: "Dae K.", isQ: true } ] },
-  ];
-
   // The pause is one guided sequence, the same every time — body, then breath, then mind (mind last).
   // Each step has its own visual: the body shifts, the breath opens and closes, the mind goes still.
   // It ends on a still dot, then two doors: forth (leave) or question (stay). The user decides.
@@ -137,35 +99,61 @@
     { head: "Open your mind", sub: "prepare space without thought",  ms: 13000, kind: "mind"   },
   ];
 
-  const NAV = [
-    { key: "shock",     label: "Shock" },
-    { key: "pause",     label: "Pause" },
-    { key: "questions", label: "Questions" },
-    { key: "study",     label: "Study Room" },
-    { key: "about",     label: "About" },
-  ];
-
   const state = {
     screen: "shock",
     theme: "dark",
     // Sounds off (Jamie, Jul 13). If reintroduced later: lower pitch, calm, marimba-like.
     sound: false,
     pauseStep: 0,
-    callIdxs: [],
-    currentIdx: null,
+    callIds: [],
+    currentQuestion: null,
     byoqStage: "open",
+    lastQuestionId: null,
+    pushState: "loading",
   };
 
   const phone   = document.getElementById("phone");
   const screen  = document.getElementById("screen");
-  const pillsEl = document.getElementById("pills");
-  const dockEl  = document.querySelector(".dock");
   let timer = null;
 
   const clearTimer = () => { if (timer) { clearTimeout(timer); timer = null; } };
-  const curQ = () => (state.currentIdx == null ? null : GROUP[state.currentIdx]);
+  const curQ = () => state.currentQuestion;
   const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  const TOKEN_KEY = "forth:delete-tokens";
+  const readTokens = () => { try { return JSON.parse(localStorage.getItem(TOKEN_KEY) || "{}"); } catch (e) { return {}; } };
+  const tokenKey = (kind, id) => `${kind}:${id}`;
+  const canDelete = (kind, id) => Boolean(readTokens()[tokenKey(kind, id)]);
+  function saveDeleteToken(kind, id, token) {
+    try {
+      const tokens = readTokens();
+      tokens[tokenKey(kind, id)] = token;
+      localStorage.setItem(TOKEN_KEY, JSON.stringify(tokens));
+      return true;
+    } catch (error) {
+      console.error(error);
+      return false;
+    }
+  }
+  function forgetDeleteToken(kind, id) {
+    const tokens = readTokens();
+    delete tokens[tokenKey(kind, id)];
+    localStorage.setItem(TOKEN_KEY, JSON.stringify(tokens));
+  }
+  async function api(path, options = {}) {
+    const response = await fetch(path, {
+      ...options,
+      headers: { "Content-Type": "application/json", ...(options.headers || {}) }
+    });
+    if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+    return response.status === 204 ? null : response.json();
+  }
+  async function deleteWords(kind, id, token) {
+    const response = await fetch(`/api/${kind}/${id}`, {
+      method: "DELETE",
+      headers: { "x-delete-token": token }
+    });
+    if (response.status !== 204 && response.status !== 404) throw new Error(`Delete failed: ${response.status}`);
+  }
 
   // ---- Small "faces": initial avatars -------------------------------------
   const AV_COLORS = ["rgba(170,181,152,0.34)","rgba(192,138,94,0.30)","rgba(138,153,129,0.36)","rgba(150,142,120,0.34)","rgba(120,150,150,0.32)"];
@@ -200,13 +188,16 @@
   }
 
   // ---- Questions ----------------------------------------------------------
-  function pullQuestion() {
-    const avail = GROUP.map((_, i) => i).filter(i => !state.callIdxs.includes(i));
-    const idx = avail.length ? pick(avail) : 0;
-    state.callIdxs.push(idx);
-    state.currentIdx = idx;
+  async function pullQuestion() {
+    const exclude = state.callIds.length ? `?exclude=${state.callIds.join(",")}` : "";
+    const { question } = await api(`/api/questions/random${exclude}`);
+    state.currentQuestion = question;
+    if (!state.callIds.includes(question.id)) state.callIds.push(question.id);
   }
-  function ensureFocus() { if (state.currentIdx == null) state.currentIdx = Math.floor(Math.random() * GROUP.length); }
+
+  const ownAction = (kind, id) => canDelete(kind, id)
+    ? `<span class="tap" data-action="delete" data-kind="${kind}" data-id="${id}" style="font-size:11px; letter-spacing:0.06em; color:var(--faint);">remove my words</span>`
+    : "";
 
   // ---- Pause building blocks ----------------------------------------------
   const dotsHTML = (active) => PAUSE_STEPS.map((_, i) =>
@@ -277,6 +268,29 @@
     }, step.ms);
   }
 
+  function pushSectionHTML() {
+    if (state.pushState === "on") return `
+      <div style="font-size:14.5px; line-height:1.7; color:var(--muted); margin-bottom:14px;">Forth may call at an unexpected moment. Nothing else will be sent.</div>
+      <span class="tap" data-action="disablePush" style="font-size:12px; letter-spacing:0.1em; color:var(--faint);">silence the call</span>`;
+    if (state.pushState === "install") return `
+      <div style="font-size:14.5px; line-height:1.7; color:var(--muted);">In Safari, use Share and <em>Add to Home Screen</em>. Open Forth from there to allow the call.</div>`;
+    if (state.pushState === "ready") return `
+      <div style="font-size:14.5px; line-height:1.7; color:var(--muted); margin-bottom:16px;">Allow a quiet reminder at an unexpected moment. The notification carries only the shock.</div>
+      <span class="tap act" data-action="enablePush" style="display:inline-block; color:var(--accent); border:1px solid var(--accent-line); border-radius:999px; padding:11px 24px;">allow the call</span>`;
+    if (state.pushState === "blocked") return `<div style="font-size:14.5px; line-height:1.7; color:var(--muted);">Notifications are silenced in this browser's settings.</div>`;
+    if (state.pushState === "unavailable") return `<div style="font-size:14.5px; line-height:1.7; color:var(--muted);">This browser cannot receive the call.</div>`;
+    return `<div style="font-size:14.5px; color:var(--faint);">&nbsp;</div>`;
+  }
+
+  function deviceWordsHTML() {
+    if (!Object.keys(readTokens()).length) return "";
+    return `
+      <div class="serif" style="font-size:18px; color:var(--fg-strong); margin-bottom:8px;">Your words</div>
+      <div style="font-size:14.5px; line-height:1.7; color:var(--muted); margin-bottom:14px;">This device remembers only what it needs to remove words written here.</div>
+      <span class="tap" data-action="deleteAll" style="font-size:12px; letter-spacing:0.1em; color:var(--faint);">remove my words from this device</span>
+      <div style="height:28px;"></div>`;
+  }
+
   // ---- Screens ------------------------------------------------------------
   const screens = {
     // The shock: the app opens on two words — "I am" — blooming slowly for ~5s,
@@ -317,13 +331,13 @@
       return `
       <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 40px 44px; animation:forFade 1.6s ease both;">
         <div style="flex:1"></div>
-        <div class="serif" style="font-size:30px; font-weight:400; line-height:1.42; text-align:center; text-wrap:balance; color:var(--fg-strong); animation:forRise 1.8s ease both;">${esc(q.q)}</div>
+        <div class="serif" style="font-size:30px; font-weight:400; line-height:1.42; text-align:center; text-wrap:balance; color:var(--fg-strong); animation:forRise 1.8s ease both;">${esc(q.text)}</div>
         <div style="margin-top:22px; animation:forHint 3.5s ease both;">
           <span class="tap replies-link" data-go="study">read more</span>
         </div>
         <div style="flex:1"></div>
         <div style="display:flex; flex-direction:column; align-items:center; gap:18px; animation:forHint 4s ease both;">
-          ${state.callIdxs.length < 2 ? `<span class="tap act" data-action="another" style="color:var(--muted);">another</span>` : ``}
+          ${state.callIds.length < 2 ? `<span class="tap act" data-action="another" style="color:var(--muted);">another</span>` : ``}
           <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
         </div>
       </div>`;
@@ -336,15 +350,16 @@
       // The Reply action below is the only thing offered. (Jamie, Jul 20.)
       const body = q.replies.map(r => `
             <div style="margin-bottom:26px;">
-              ${r.isQ
-                ? `<div class="serif" style="font-style:italic; font-size:18px; line-height:1.5; color:var(--fg-strong);">${esc(r.t)}</div>`
-                : `<div style="font-size:15.5px; line-height:1.72; color:var(--fg);">${esc(r.t)}</div>`}
-              ${authorRow(r.by || "a member", r.isQ ? "a question in reply" : "")}
+              <div style="font-size:15.5px; line-height:1.72; color:var(--fg);">${esc(r.text)}</div>
+              ${authorRow(r.handle, "")}
+              <div style="margin:8px 0 0 33px;">${ownAction("replies", r.id)}</div>
             </div>`).join("");
       return `
       <div style="height:100%; overflow-y:auto; padding:72px 28px 40px; animation:forFade 1s ease both;">
         <div class="serif" style="font-size:14px; letter-spacing:0.18em; text-transform:uppercase; color:var(--accent); margin-bottom:18px;">The Study Room</div>
-        <div class="serif" style="font-size:24px; line-height:1.4; color:var(--fg-strong); margin-bottom:8px;">${esc(q.q)}</div>
+        <div class="serif" style="font-size:24px; line-height:1.4; color:var(--fg-strong); margin-bottom:8px;">${esc(q.text)}</div>
+        ${authorRow(q.handle, "")}
+        <div style="margin:8px 0 0 33px;">${ownAction("questions", q.id)}</div>
         <div style="height:1px; background:var(--hair); margin:20px 0 26px;"></div>
         ${body}
         ${q.replies.length ? `<div style="height:1px; background:var(--hair); margin:14px 0 26px;"></div>` : ``}
@@ -353,7 +368,10 @@
             <span class="tap act" data-go="respond" style="color:var(--accent);">Reply</span>
             <span class="tap act" data-go="byoq" style="color:var(--muted);">Ask a question</span>
           </div>
-          <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
+          <div style="display:flex; gap:26px;">
+            <div class="tap" data-go="about" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">about</div>
+            <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
+          </div>
         </div>
       </div>`;
     },
@@ -363,12 +381,13 @@
       return `
       <div style="height:100%; display:flex; flex-direction:column; padding:84px 34px 44px; animation:forFade 1s ease both;">
         <div class="serif" style="font-size:13px; letter-spacing:0.16em; text-transform:uppercase; color:var(--accent); margin-bottom:16px;">Responding to</div>
-        <div class="serif" style="font-size:21px; line-height:1.4; color:var(--fg-strong); margin-bottom:8px;">${esc(q.q)}</div>
-        <div style="font-size:12px; color:var(--faint); margin-bottom:22px;">as ${esc(ME)}</div>
+        <div class="serif" style="font-size:21px; line-height:1.4; color:var(--fg-strong); margin-bottom:22px;">${esc(q.text)}</div>
+        <input id="respondHandle" maxlength="80" autocomplete="off" placeholder="name (or leave blank for anon)" style="width:100%; background:transparent; border:none; border-bottom:1px solid var(--hair); padding:8px 0; margin-bottom:18px; font:13px 'Hanken Grotesk',sans-serif; letter-spacing:0.03em; color:var(--fg);">
         <textarea id="respondInput" rows="5" placeholder="Say only what's true. No one is timing you." style="width:100%; background:transparent; border:none; border-bottom:1px solid var(--hair); padding:8px 0; font-family:'Source Serif 4',serif; font-size:19px; line-height:1.5; color:var(--fg-strong); resize:none;"></textarea>
         <div style="flex:1"></div>
         <div class="tap act" data-action="reply" style="align-self:center; color:var(--accent); border:1px solid var(--accent-line); border-radius:999px; padding:13px 32px;">Reply</div>
         <div style="text-align:center; margin-top:14px; font-size:11.5px; letter-spacing:0.1em; color:var(--faint);">when you reply, it will hold you a moment</div>
+        <div class="tap" data-go="rest" style="text-align:center; margin-top:20px; font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
       </div>`;
     },
 
@@ -417,10 +436,13 @@
       <div style="height:100%; overflow-y:auto; padding:80px 30px 56px; animation:forFade 1.2s ease both;">
         <div class="serif" style="font-size:15px; letter-spacing:0.16em; text-transform:uppercase; color:var(--accent); margin-bottom:20px;">About this group</div>
         <div class="serif" style="font-size:19px; line-height:1.62; color:var(--fg); margin-bottom:16px;">We are a living group formed in 2026 to study and discuss the ideas of Gurdjieff's Fourth Way. We seek to remember ourselves. We claim no authority or lineage.</div>
-        <div style="font-size:15px; line-height:1.72; color:var(--muted); margin-bottom:14px;">Current members are encouraged to read, reflect, and contribute. All content here is user-generated. It is kept for continued reflection but may not be permanent. The group is alive: members come and go, and what exists in this space is the responsibility of the current users.</div>
+        <div style="font-size:15px; line-height:1.72; color:var(--muted); margin-bottom:14px;">Current members are encouraged to read, reflect, and contribute. All content here is user-generated and kept for continued reflection. The group is alive: members come and go, and what exists in this space is the responsibility of the current users.</div>
         <div style="height:1px; background:var(--hair); margin:26px 0;"></div>
         <div class="serif" style="font-size:18px; color:var(--fg-strong); margin-bottom:8px;">Why a phone?</div>
         <div style="font-size:15px; line-height:1.72; color:var(--muted); margin-bottom:26px;">It's hard to say what Gurdjieff would make of these devices. They're built to be addictive — and the work is to break free of automatism. Learning to use one with attention may be exactly the training.</div>
+        <div class="serif" style="font-size:18px; color:var(--fg-strong); margin-bottom:8px;">Let it call</div>
+        <div id="pushSection" style="margin-bottom:28px;">${pushSectionHTML()}</div>
+        ${deviceWordsHTML()}
         <div class="serif" style="font-size:18px; color:var(--fg-strong); margin-bottom:16px;">Suggestions for being here</div>
         <div style="display:flex; flex-direction:column; gap:20px;">
           ${[
@@ -434,7 +456,7 @@
               <div style="font-size:14.5px; line-height:1.7; color:var(--muted);">${b}</div>
             </div>`).join("")}
         </div>
-        <div style="height:20px;"></div>
+        <div class="tap" data-go="rest" style="text-align:center; margin-top:30px; font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
       </div>`,
 
     byoq: () => state.byoqStage === "open" ? `
@@ -442,24 +464,27 @@
         <div class="serif" style="font-size:15px; letter-spacing:0.16em; text-transform:uppercase; color:var(--accent); margin-bottom:26px;">A question of your own</div>
         <div class="serif" style="font-size:24px; line-height:1.4; color:var(--fg-strong); margin-bottom:8px;">Leave a question with the group.</div>
         <div style="font-size:14.5px; line-height:1.7; color:var(--muted); margin-bottom:34px;">Not to be answered. To be lived with. No one will like it, count it, or reply — until, one day, someone does.</div>
+        <input id="byoqHandle" maxlength="80" autocomplete="off" placeholder="name (or leave blank for anon)" style="width:100%; background:transparent; border:none; border-bottom:1px solid var(--hair); padding:8px 0; margin-bottom:18px; font:13px 'Hanken Grotesk',sans-serif; letter-spacing:0.03em; color:var(--fg);">
         <textarea id="byoqInput" rows="3" placeholder="What do you want to sit with?" style="width:100%; background:transparent; border:none; border-bottom:1px solid var(--hair); padding:8px 0; font-family:'Source Serif 4',serif; font-size:20px; line-height:1.4; color:var(--fg-strong); resize:none;"></textarea>
         <div style="flex:1"></div>
         <div class="tap act" data-action="submitByoq" style="align-self:center; color:var(--accent); border:1px solid var(--accent-line); border-radius:999px; padding:13px 30px;">Leave it</div>
+        <div class="tap" data-go="rest" style="text-align:center; margin-top:20px; font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
       </div>` : `
       <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:64px 34px; animation:forFade 1.4s ease both;">
         <div class="serif" style="font-style:italic; font-size:22px; color:var(--fg-strong); margin-bottom:14px;">It's with the group.</div>
         <div style="font-size:14px; line-height:1.7; color:var(--muted); max-width:250px; margin-bottom:30px;">Let it be. It will find you, or someone, another day.</div>
+        <div style="margin-bottom:22px;">${state.lastQuestionId ? ownAction("questions", state.lastQuestionId) : ""}</div>
         <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
+      </div>`,
+
+    roomError: () => `
+      <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:64px 40px; animation:forFade 1.4s ease both;">
+        <div class="serif" style="font-size:21px; line-height:1.5; color:var(--fg-strong);">The room could not be reached.</div>
+        <div class="tap act" data-action="retry" style="margin-top:28px; color:var(--accent);">try again</div>
       </div>`,
   };
 
   // ---- Render & navigation ------------------------------------------------
-  // The shock and the pause are the "real app" — no prototype chrome over them.
-  function updateDockVisibility() {
-    const bare = ["shock", "pause", "still", "choice"].includes(state.screen);
-    dockEl.style.display = bare ? "none" : "";
-  }
-
   // Paint the current screen. When `dissolve` is true, the transition fades the
   // screen down to a full black hold (~1s) and back up — a deliberate breath of
   // darkness between phases, not a crossfade. (Jamie's call.)
@@ -468,8 +493,6 @@
   function commitScreen() {
     phone.setAttribute("data-theme", state.theme);
     screen.innerHTML = screens[state.screen]();
-    renderPills();
-    updateDockVisibility();
   }
   function paintScreen(dissolve) {
     if (!dissolve || !screen.innerHTML.trim()) { commitScreen(); return; }
@@ -493,12 +516,22 @@
 
   function render() { paintScreen(false); }
 
-  function go(name) {
+  async function go(name) {
     clearTimer();
 
-    if (name === "shock" || name === "pause") state.callIdxs = [];
-    if (name === "questions" && state.callIdxs.length === 0) pullQuestion();
-    if (name === "study" || name === "respond" || name === "byoq") ensureFocus();
+    if (name === "shock" || name === "pause") {
+      state.callIds = [];
+      state.currentQuestion = null;
+    }
+    try {
+      if (name === "questions" && state.callIds.length === 0) await pullQuestion();
+      if (["study", "respond", "byoq"].includes(name) && !curQ()) await pullQuestion();
+    } catch (error) {
+      console.error(error);
+      state.screen = "roomError";
+      paintScreen(true);
+      return;
+    }
     if (name === "byoq") state.byoqStage = "open";
 
     state.screen = name;
@@ -514,66 +547,192 @@
     paintScreen(true);
 
     if (name === "shock") {
-      timer = setTimeout(() => { go("pause"); }, 5800);  // "I am" gets its five seconds, then dissolves straight into the pause
+      timer = setTimeout(() => { void go("pause"); }, 5800);  // "I am" gets its five seconds, then dissolves straight into the pause
     } else if (name === "still") {
-      timer = setTimeout(() => { go("choice"); }, 6500); // ~5s of visible stillness once the dissolve clears, then the two doors
+      timer = setTimeout(() => { void go("choice"); }, 6500); // ~5s of visible stillness once the dissolve clears, then the two doors
     } else if (name === "freeze") {
-      timer = setTimeout(() => { go("rest"); }, 10000);
+      timer = setTimeout(() => { void go("rest"); }, 10000);
     } else if (name === "rest") {
-      timer = setTimeout(() => { go("shock"); }, 14000); // long enough to receive all three lines
+      timer = setTimeout(() => { void go("shock"); }, 14000); // long enough to receive all three lines
     }
   }
 
-  function renderPills() {
-    pillsEl.innerHTML = NAV.map(n => {
-      const active = state.screen === n.key ||
-        (n.key === "pause" && ["still", "choice"].includes(state.screen)) ||
-        (n.key === "questions" && state.screen === "rest") ||
-        (n.key === "study" && ["respond", "freeze", "byoq"].includes(state.screen));
-      return `<div class="pill" data-active="${active}" data-go="${n.key}">${n.label}</div>`;
-    }).join("");
+  let vapidPublicKey = "";
+  const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  const isStandalone = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+
+  function applicationServerKey(value) {
+    const padding = "=".repeat((4 - value.length % 4) % 4);
+    const base64 = (value + padding).replace(/-/g, "+").replace(/_/g, "/");
+    return Uint8Array.from(atob(base64), (character) => character.charCodeAt(0));
+  }
+
+  async function refreshPushState() {
+    try {
+      if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+        state.pushState = "unavailable";
+      } else if (isIos && !isStandalone) {
+        state.pushState = "install";
+      } else if (Notification.permission === "denied") {
+        state.pushState = "blocked";
+      } else {
+        const settings = await api("/api/push/public-key");
+        if (!settings.enabled) {
+          state.pushState = "unavailable";
+        } else {
+          vapidPublicKey = settings.publicKey;
+          const registration = await navigator.serviceWorker.register("/service-worker.js");
+          const subscription = await registration.pushManager.getSubscription();
+          if (subscription) {
+            await api("/api/push/subscriptions", {
+              method: "POST",
+              body: JSON.stringify({
+                subscription: subscription.toJSON(),
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
+              })
+            });
+          }
+          state.pushState = subscription ? "on" : "ready";
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      state.pushState = "unavailable";
+    }
+    if (state.screen === "about") render();
+  }
+
+  async function enablePush() {
+    const permission = await Notification.requestPermission();
+    if (permission !== "granted") {
+      state.pushState = "blocked";
+      render();
+      return;
+    }
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: applicationServerKey(vapidPublicKey)
+    });
+    await api("/api/push/subscriptions", {
+      method: "POST",
+      body: JSON.stringify({
+        subscription: subscription.toJSON(),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
+      })
+    });
+    state.pushState = "on";
+    render();
+  }
+
+  async function disablePush() {
+    const registration = await navigator.serviceWorker.ready;
+    const subscription = await registration.pushManager.getSubscription();
+    if (subscription) {
+      await api("/api/push/unsubscribe", {
+        method: "POST",
+        body: JSON.stringify({ endpoint: subscription.endpoint })
+      });
+      await subscription.unsubscribe();
+    }
+    state.pushState = "ready";
+    render();
   }
 
   // ---- Events -------------------------------------------------------------
-  document.addEventListener("click", (e) => {
+  document.addEventListener("click", async (e) => {
     ensureAudio();
 
     const goEl = e.target.closest("[data-go]");
-    if (goEl) { go(goEl.getAttribute("data-go")); return; }
+    if (goEl) { await go(goEl.getAttribute("data-go")); return; }
 
     const act = e.target.closest("[data-action]");
     if (act) {
+      if (act.dataset.busy === "true") return;
+      act.dataset.busy = "true";
       const a = act.getAttribute("data-action");
-      if (a === "another") { if (state.callIdxs.length < 2) pullQuestion(); render(); return; }
-      if (a === "reply") {
-        const ta = document.getElementById("respondInput");
-        const val = ta && ta.value.trim();
-        if (val && curQ()) curQ().replies.push({ t: val, by: ME });
-        go("freeze"); return;
+      try {
+        if (a === "another") {
+          if (state.callIds.length < 2) await pullQuestion();
+          render(); return;
+        }
+        if (a === "reply") {
+          const text = document.getElementById("respondInput")?.value.trim();
+          const handle = document.getElementById("respondHandle")?.value.trim();
+          if (!text || !curQ()) return;
+          const { reply } = await api(`/api/questions/${curQ().id}/replies`, {
+            method: "POST", body: JSON.stringify({ text, handle })
+          });
+          if (!saveDeleteToken("replies", reply.id, reply.deleteToken)) {
+            await deleteWords("replies", reply.id, reply.deleteToken);
+            throw new Error("This device could not retain the deletion token.");
+          }
+          delete reply.deleteToken;
+          curQ().replies.push(reply);
+          await go("freeze"); return;
+        }
+        if (a === "submitByoq") {
+          const text = document.getElementById("byoqInput")?.value.trim();
+          const handle = document.getElementById("byoqHandle")?.value.trim();
+          if (!text) return;
+          const { question } = await api("/api/questions", {
+            method: "POST", body: JSON.stringify({ text, handle })
+          });
+          if (!saveDeleteToken("questions", question.id, question.deleteToken)) {
+            await deleteWords("questions", question.id, question.deleteToken);
+            throw new Error("This device could not retain the deletion token.");
+          }
+          state.lastQuestionId = question.id;
+          state.byoqStage = "done"; render(); return;
+        }
+        if (a === "delete") {
+          const kind = act.getAttribute("data-kind");
+          const id = act.getAttribute("data-id");
+          const token = readTokens()[tokenKey(kind, id)];
+          if (!token) return;
+          await deleteWords(kind, id, token);
+          forgetDeleteToken(kind, id);
+          if (kind === "questions") {
+            state.currentQuestion = null;
+            state.callIds = [];
+            state.lastQuestionId = null;
+            await go(state.screen === "byoq" ? "rest" : "questions");
+          } else {
+            curQ().replies = curQ().replies.filter((reply) => reply.id !== id);
+            render();
+          }
+          return;
+        }
+        if (a === "deleteAll") {
+          if (!window.confirm("Remove every question and reply written on this device?")) return;
+          const tokens = readTokens();
+          for (const [key, token] of Object.entries(tokens)) {
+            const separator = key.indexOf(":");
+            await deleteWords(key.slice(0, separator), key.slice(separator + 1), token);
+          }
+          localStorage.removeItem(TOKEN_KEY);
+          state.currentQuestion = null;
+          state.callIds = [];
+          state.lastQuestionId = null;
+          await go("rest");
+          return;
+        }
+        if (a === "enablePush") { await enablePush(); return; }
+        if (a === "disablePush") { await disablePush(); return; }
+        if (a === "retry") { state.callIds = []; state.currentQuestion = null; await go("questions"); return; }
+      } catch (error) {
+        console.error(error);
+        state.screen = "roomError";
+        paintScreen(true);
+      } finally {
+        if (act.isConnected) delete act.dataset.busy;
       }
-      if (a === "submitByoq") {
-        const ta = document.getElementById("byoqInput");
-        const val = ta && ta.value.trim();
-        if (val) GROUP.push({ q: val, replies: [] });
-        state.byoqStage = "done"; render(); return;
-      }
-    }
-
-    const themeEl = e.target.closest("[data-theme-set]");
-    if (themeEl) {
-      state.theme = themeEl.getAttribute("data-theme-set");
-      document.querySelectorAll("#themeSeg [data-theme-set]").forEach(d =>
-        d.setAttribute("data-on", d.getAttribute("data-theme-set") === state.theme));
-      phone.setAttribute("data-theme", state.theme);
-      return;
     }
   });
 
-  document.getElementById("themeSeg").addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.target.click(); }
-  });
-
-  go("shock");
+  void refreshPushState();
+  void go("shock");
 })();
 </script>
 </body>

@@ -1,9 +1,20 @@
-# For — a practice of remembering
+# Forth — self-remembering
 
-A concept prototype for **For**, a phone app rooted in Gurdjieff's Fourth Way that pings you at a
-random moment, holds you still for a beat, gives you one question to sit with, then gets out of your way.
-No feed, no streaks. Used briefly, then put down.
+A small-group web app rooted in Gurdjieff's Fourth Way. It interrupts automatism,
+holds a brief pause, offers one question, then gets out of the way.
 
-Live: https://sagerock.github.io/for-app/
+There are no accounts, profiles, feeds, counts, streaks, or reply notifications.
+Each post carries only the handle typed for that moment. A private deletion token
+stays on the device that wrote it.
 
-Early concept — a collaboration between Sage Lewis and Jamie Johns.
+Live: https://forth-app-production.up.railway.app/
+
+## Run locally
+
+```sh
+npm install
+DATABASE_URL=postgres://... npm start
+```
+
+The app and API run as one Railway service backed by Postgres. `npm run push:send`
+is the short-lived cron worker that sends scheduled shock-only web pushes.
