@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#141310">
-<title>Forth — a practice of remembering</title>
+<title>Forth — self-remembering</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=Hanken+Grotesk:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -41,6 +41,17 @@
   .brand { position: absolute; top: calc(env(safe-area-inset-top, 0px) + 22px); left: 50%; transform: translateX(-50%);
     z-index: 9; font-family: 'Source Serif 4', Georgia, serif; font-weight: 400; font-size: 19px;
     letter-spacing: 0.02em; color: var(--muted); pointer-events: none; }
+
+  /* The ordinal: "For" + a raised "th", so the wordmark reads as Forth AND as
+     4th at the same time. (Jamie, Jul 20.) Deliberately larger than a default
+     <sup> (0.583em). Sizes were rendered side by side at the real 19px: 0.583
+     and 0.66 still read as a footnote, 0.80 collapses back toward plain "Forth"
+     and looks like a typo. 0.72 is the one that reads as an ordinal. Raised
+     0.34em so its top sits just under the cap height of "F", not above it;
+     letter-spacing opens it slightly because small serif type sets tight.
+     Two numbers to retune if it wants to be bolder: font-size and bottom. */
+  .ord { font-size: 0.72em; line-height: 1; letter-spacing: 0.04em;
+    position: relative; bottom: 0.34em; vertical-align: baseline; }
 
   @keyframes forBreathe { 0%,100%{ transform:scale(0.62); opacity:0.45; } 50%{ transform:scale(1.04); opacity:0.92; } }
   @keyframes forFade { from{ opacity:0; } to{ opacity:1; } }
@@ -81,7 +92,7 @@
 
   <div class="phone" id="phone" data-theme="dark">
     <div class="screen" id="screen"></div>
-    <div class="brand serif" id="brand">Forth</div>
+    <div class="brand serif" id="brand">For<span class="ord">th</span></div>
   </div>
 
   <div class="dock">
@@ -278,7 +289,7 @@
         <div style="flex:1"></div>
         <div class="serif" style="font-size:64px; font-weight:400; line-height:1; color:var(--fg-strong); animation:forNow 5.2s cubic-bezier(0.22,0.6,0.36,1) both;">I am</div>
         <div style="flex:1"></div>
-        <div style="font-size:12.5px; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted);">a practice of remembering</div>
+        <div style="font-size:12.5px; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted);">self-remembering</div>
       </div>`,
 
     // The guided pause: body -> breath -> mind. The image runs CONTINUOUSLY the
