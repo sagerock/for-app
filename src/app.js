@@ -149,6 +149,10 @@ export function createApp(repository, { vapidPublicKey = "" } = {}) {
     res.sendFile(path.join(ROOT, "service-worker.js"));
   });
   app.use("/icons", express.static(path.join(ROOT, "icons"), { maxAge: "7d" }));
+  app.get("/favicon.ico", (req, res) => {
+    res.setHeader("Cache-Control", "public, max-age=604800");
+    res.sendFile(path.join(ROOT, "icons", "forth-192.png"));
+  });
   app.get("/", (req, res) => res.sendFile(path.join(ROOT, "index.html")));
 
   app.use((error, req, res, next) => {

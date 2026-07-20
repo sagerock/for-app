@@ -7,6 +7,7 @@
 <title>Forth — self-remembering</title>
 <script>if (location.hostname === "sagerock.github.io") location.replace("https://forth-app-production.up.railway.app/" + location.search + location.hash);</script>
 <link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" type="image/png" href="/icons/forth-192.png">
 <link rel="apple-touch-icon" href="/icons/forth-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -196,8 +197,12 @@
     if (!state.callIds.includes(question.id)) state.callIds.push(question.id);
   }
 
-  const ownAction = (kind, id) => canDelete(kind, id)
-    ? `<span class="tap" data-action="delete" data-kind="${kind}" data-id="${id}" style="font-size:11px; letter-spacing:0.06em; color:var(--faint);">remove my words</span>`
+  // Renders its own wrapper so screens with no delete right emit nothing at all
+  // (an empty spacer div is still a trace of a control you don't have). The
+  // default margin indents past the study-room avatar; centered screens pass
+  // their own.
+  const ownAction = (kind, id, wrap = "margin:8px 0 0 33px;") => canDelete(kind, id)
+    ? `<div style="${wrap}"><span class="tap" data-action="delete" data-kind="${kind}" data-id="${id}" style="font-size:11px; letter-spacing:0.06em; color:var(--faint);">remove my words</span></div>`
     : "";
 
   // ---- Pause building blocks ----------------------------------------------
@@ -339,7 +344,10 @@
         <div style="flex:1"></div>
         <div style="display:flex; flex-direction:column; align-items:center; gap:18px; animation:forHint 4s ease both;">
           ${state.callIds.length < 2 ? `<span class="tap act" data-action="another" style="color:var(--muted);">another</span>` : ``}
-          <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
+          <div style="display:flex; gap:26px;">
+            <div class="tap" data-go="about" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">about</div>
+            <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
+          </div>
         </div>
       </div>`;
     },
@@ -353,14 +361,14 @@
             <div style="margin-bottom:26px;">
               <div style="font-size:15.5px; line-height:1.72; color:var(--fg);">${esc(r.text)}</div>
               ${authorRow(r.handle, "")}
-              <div style="margin:8px 0 0 33px;">${ownAction("replies", r.id)}</div>
+              ${ownAction("replies", r.id)}
             </div>`).join("");
       return `
       <div style="height:100%; overflow-y:auto; padding:72px 28px 40px; animation:forFade 1s ease both;">
         <div class="serif" style="font-size:14px; letter-spacing:0.18em; text-transform:uppercase; color:var(--accent); margin-bottom:18px;">The Study Room</div>
         <div class="serif" style="font-size:24px; line-height:1.4; color:var(--fg-strong); margin-bottom:8px;">${esc(q.text)}</div>
         ${authorRow(q.handle, "")}
-        <div style="margin:8px 0 0 33px;">${ownAction("questions", q.id)}</div>
+        ${ownAction("questions", q.id)}
         <div style="height:1px; background:var(--hair); margin:20px 0 26px;"></div>
         ${body}
         ${q.replies.length ? `<div style="height:1px; background:var(--hair); margin:14px 0 26px;"></div>` : ``}
@@ -474,7 +482,7 @@
       <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:64px 34px; animation:forFade 1.4s ease both;">
         <div class="serif" style="font-style:italic; font-size:22px; color:var(--fg-strong); margin-bottom:14px;">It's with the group.</div>
         <div style="font-size:14px; line-height:1.7; color:var(--muted); max-width:250px; margin-bottom:30px;">Let it be. It will find you, or someone, another day.</div>
-        <div style="margin-bottom:22px;">${state.lastQuestionId ? ownAction("questions", state.lastQuestionId) : ""}</div>
+        ${state.lastQuestionId ? ownAction("questions", state.lastQuestionId, "margin-bottom:22px;") : ""}
         <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
       </div>`,
 
