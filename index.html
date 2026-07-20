@@ -310,29 +310,31 @@
 
     questions: () => {
       const q = curQ();
-      const n = q.replies.length;
-      const label = n > 0 ? `${n} ${n === 1 ? "reply" : "replies"} — enter the study room` : "no replies yet — enter the study room";
+      // No counts, and no absence-of-counts either (Jamie, Jul 20). The link is
+      // ALWAYS "read more", worded and shown identically whether or not anyone
+      // has replied — because a link that appears only when replies exist is
+      // itself a count, just a coarse one. You find out by going.
       return `
       <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 40px 44px; animation:forFade 1.6s ease both;">
         <div style="flex:1"></div>
         <div class="serif" style="font-size:30px; font-weight:400; line-height:1.42; text-align:center; text-wrap:balance; color:var(--fg-strong); animation:forRise 1.8s ease both;">${esc(q.q)}</div>
         <div style="margin-top:22px; animation:forHint 3.5s ease both;">
-          <span class="tap replies-link" data-go="study">${label}</span>
+          <span class="tap replies-link" data-go="study">read more</span>
         </div>
         <div style="flex:1"></div>
         <div style="display:flex; flex-direction:column; align-items:center; gap:18px; animation:forHint 4s ease both;">
           ${state.callIdxs.length < 2 ? `<span class="tap act" data-action="another" style="color:var(--muted);">another</span>` : ``}
-          <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">put it down</div>
+          <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
         </div>
       </div>`;
     },
 
     study: () => {
       const q = curQ();
-      const n = q.replies.length;
-      const body = n === 0
-        ? `<div style="font-size:15px; line-height:1.7; color:var(--muted); font-style:italic;">No one has replied. You could be the first — or let it stand, unanswered.</div>`
-        : q.replies.map(r => `
+      // An unanswered question shows the question and nothing else — no "no one
+      // has replied yet", which is just a count of zero wearing a sentence.
+      // The Reply action below is the only thing offered. (Jamie, Jul 20.)
+      const body = q.replies.map(r => `
             <div style="margin-bottom:26px;">
               ${r.isQ
                 ? `<div class="serif" style="font-style:italic; font-size:18px; line-height:1.5; color:var(--fg-strong);">${esc(r.t)}</div>`
@@ -343,10 +345,9 @@
       <div style="height:100%; overflow-y:auto; padding:72px 28px 40px; animation:forFade 1s ease both;">
         <div class="serif" style="font-size:14px; letter-spacing:0.18em; text-transform:uppercase; color:var(--accent); margin-bottom:18px;">The Study Room</div>
         <div class="serif" style="font-size:24px; line-height:1.4; color:var(--fg-strong); margin-bottom:8px;">${esc(q.q)}</div>
-        <div style="font-size:12.5px; letter-spacing:0.06em; color:var(--muted); margin-bottom:24px;">${n} ${n === 1 ? "reply" : "replies"} · no counts kept, no order but arrival</div>
-        <div style="height:1px; background:var(--hair); margin-bottom:26px;"></div>
+        <div style="height:1px; background:var(--hair); margin:20px 0 26px;"></div>
         ${body}
-        <div style="height:1px; background:var(--hair); margin:14px 0 26px;"></div>
+        ${q.replies.length ? `<div style="height:1px; background:var(--hair); margin:14px 0 26px;"></div>` : ``}
         <div style="display:flex; flex-direction:column; align-items:center; gap:18px;">
           <div style="display:flex; gap:26px;">
             <span class="tap act" data-go="respond" style="color:var(--accent);">Reply</span>
@@ -448,7 +449,7 @@
       <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:64px 34px; animation:forFade 1.4s ease both;">
         <div class="serif" style="font-style:italic; font-size:22px; color:var(--fg-strong); margin-bottom:14px;">It's with the group.</div>
         <div style="font-size:14px; line-height:1.7; color:var(--muted); max-width:250px; margin-bottom:30px;">Let it be. It will find you, or someone, another day.</div>
-        <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">put it down</div>
+        <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
       </div>`,
   };
 
