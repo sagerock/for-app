@@ -48,7 +48,7 @@
   @keyframes forHint { 0%,55%{ opacity:0; } 100%{ opacity:0.4; } }
   @keyframes forPulse { 0%,100%{ opacity:0.25; } 50%{ opacity:0.7; } }
   @keyframes forStep { from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
-  /* Shock: "Now" blooms slowly — still arriving for the full five seconds */
+  /* Shock: "I am" blooms slowly — still arriving for the full five seconds */
   @keyframes forNow { from{ opacity:0; transform:scale(0.86); } to{ opacity:1; transform:scale(1); } }
   /* Body step: an upright form that gently shifts its weight — distinct from the breath */
   @keyframes forTilt { 0%,100%{ transform:rotate(-4.5deg); } 50%{ transform:rotate(4.5deg); } }
@@ -268,14 +268,15 @@
 
   // ---- Screens ------------------------------------------------------------
   const screens = {
-    // The shock: the app opens on one word — "Now" — blooming slowly for ~5s,
+    // The shock: the app opens on two words — "I am" — blooming slowly for ~5s,
     // then dissolves on its own into the pause. The "Forth" wordmark lives in the
-    // persistent top brand now (see .brand), so the screen is just Now. No tap,
-    // no call screen, no clock.
+    // persistent top brand now (see .brand), so the screen is just those words.
+    // No tap, no call screen, no clock. (Was "Now"; Jamie, Jul 20 — self-
+    // remembering rather than present-moment.)
     shock: () => `
       <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 40px 56px; animation:forFade 1.2s ease both;">
         <div style="flex:1"></div>
-        <div class="serif" style="font-size:64px; font-weight:400; line-height:1; color:var(--fg-strong); animation:forNow 5.2s cubic-bezier(0.22,0.6,0.36,1) both;">Now</div>
+        <div class="serif" style="font-size:64px; font-weight:400; line-height:1; color:var(--fg-strong); animation:forNow 5.2s cubic-bezier(0.22,0.6,0.36,1) both;">I am</div>
         <div style="flex:1"></div>
         <div style="font-size:12.5px; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted);">a practice of remembering</div>
       </div>`,
@@ -501,7 +502,7 @@
     paintScreen(true);
 
     if (name === "shock") {
-      timer = setTimeout(() => { go("pause"); }, 5800);  // "Now" gets its five seconds, then dissolves straight into the pause
+      timer = setTimeout(() => { go("pause"); }, 5800);  // "I am" gets its five seconds, then dissolves straight into the pause
     } else if (name === "still") {
       timer = setTimeout(() => { go("choice"); }, 6500); // ~5s of visible stillness once the dissolve clears, then the two doors
     } else if (name === "freeze") {
