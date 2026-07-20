@@ -25,10 +25,13 @@
     .phone { width: 100%; height: 100dvh; border-radius: 0; box-shadow: none; }
   }
 
-  .phone[data-theme="dark"] { --bg:#141310; --card:rgba(230,224,208,0.06);
-    --fg-strong:#efe9dc; --fg:#d7d1c2; --muted:rgba(215,209,194,0.44); --faint:rgba(215,209,194,0.20);
-    --accent:#aab598; --accent-glow:radial-gradient(circle, rgba(170,181,152,0.16), rgba(170,181,152,0) 70%);
-    --accent-line:rgba(170,181,152,0.45); --hair:rgba(215,209,194,0.12); }
+  /* Dark theme lifted ~15% (Jamie, Jul 20: "needs to be about 15% brighter
+     overall. Hard to see" — on a phone OLED the old muted/faint alphas nearly
+     vanished). The background stays; only the light on the words rises. */
+  .phone[data-theme="dark"] { --bg:#141310; --card:rgba(230,224,208,0.08);
+    --fg-strong:#faf5e9; --fg:#e4ded0; --muted:rgba(222,216,202,0.56); --faint:rgba(222,216,202,0.30);
+    --accent:#b6c1a3; --accent-glow:radial-gradient(circle, rgba(182,193,163,0.20), rgba(182,193,163,0) 70%);
+    --accent-line:rgba(182,193,163,0.55); --hair:rgba(222,216,202,0.15); }
   .phone[data-theme="paper"] { --bg:#faf8f3; --card:rgba(255,255,255,0.72);
     --fg-strong:#2b2a26; --fg:#4b4843; --muted:rgba(75,72,67,0.62); --faint:rgba(75,72,67,0.32);
     --accent:#58654d; --accent-glow:radial-gradient(circle, rgba(88,101,77,0.12), rgba(88,101,77,0) 70%);
@@ -78,8 +81,21 @@
   textarea::placeholder, input::placeholder { color: var(--faint); }
   .tap:focus-visible { outline: 2px solid var(--accent, #aab598); outline-offset: 3px; border-radius: 8px; }
 
+  /* Reduce Motion: in this app, motion is instruction, not decoration — the
+     breathing circle IS the guidance, and the slow arrivals ARE the pacing.
+     The old blanket rule (all animations -> 1ms) turned the whole app static
+     for anyone with the iOS accessibility setting on, which read as "the
+     animations don't work on my phone" (Jamie, Jul 14 + Jul 20). Instead:
+     honor the setting by removing spatial movement — scale, tilt, rise — and
+     re-express the same keyframes as pure light, at their full durations. The
+     breath still breathes, as a slow pulse of brightness instead of expansion. */
   @media (prefers-reduced-motion: reduce) {
-    * { animation-duration: 1ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; }
+    @keyframes forBreathe { 0%,100%{ transform:none; opacity:0.45; } 50%{ transform:none; opacity:0.92; } }
+    @keyframes forNow  { from{ opacity:0; transform:none; } to{ opacity:1; transform:none; } }
+    @keyframes forRise { from{ opacity:0; transform:none; } to{ opacity:1; transform:none; } }
+    @keyframes forStep { from{ opacity:0; transform:none; } to{ opacity:1; transform:none; } }
+    /* the metronome stick pulses in brightness instead of swaying */
+    @keyframes forTilt { 0%,100%{ transform:none; opacity:0.5; } 50%{ transform:none; opacity:1; } }
   }
 </style>
 </head>
@@ -146,7 +162,11 @@
       ...options,
       headers: { "Content-Type": "application/json", ...(options.headers || {}) }
     });
-    if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+    if (!response.ok) {
+      const error = new Error(`Request failed: ${response.status}`);
+      error.status = response.status;
+      throw error;
+    }
     return response.status === 204 ? null : response.json();
   }
   async function deleteWords(kind, id, token) {
@@ -192,9 +212,15 @@
   // ---- Questions ----------------------------------------------------------
   async function pullQuestion() {
     const exclude = state.callIds.length ? `?exclude=${state.callIds.join(",")}` : "";
-    const { question } = await api(`/api/questions/random${exclude}`);
-    state.currentQuestion = question;
-    if (!state.callIds.includes(question.id)) state.callIds.push(question.id);
+    try {
+      const { question } = await api(`/api/questions/random${exclude}`);
+      state.currentQuestion = question;
+      if (!state.callIds.includes(question.id)) state.callIds.push(question.id);
+    } catch (error) {
+      // 404 means nobody has asked anything yet — a quiet room, not an outage.
+      if (error.status === 404) { state.currentQuestion = null; return; }
+      throw error;
+    }
   }
 
   // Renders its own wrapper so screens with no delete right emit nothing at all
@@ -330,6 +356,24 @@
 
     questions: () => {
       const q = curQ();
+      // The quiet room: no one has asked anything yet. Not an error — an
+      // invitation. The first real question is what opens the space.
+      if (!q) return `
+      <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px 40px 44px; animation:forFade 1.6s ease both;">
+        <div style="flex:1"></div>
+        <div class="serif" style="font-size:26px; font-weight:400; line-height:1.5; text-align:center; text-wrap:balance; color:var(--fg-strong); animation:forRise 1.8s ease both;">The room is quiet.</div>
+        <div style="margin-top:14px; font-size:14.5px; line-height:1.7; color:var(--muted); text-align:center; max-width:260px; animation:forRise 1.8s ease 0.3s both;">No one has left a question yet. Yours could be the first.</div>
+        <div style="margin-top:30px; animation:forHint 3.5s ease both;">
+          <span class="tap act" data-go="byoq" style="color:var(--accent); border:1px solid var(--accent-line); border-radius:999px; padding:12px 26px;">Ask a question</span>
+        </div>
+        <div style="flex:1"></div>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:18px; animation:forHint 4s ease both;">
+          <div style="display:flex; gap:26px;">
+            <div class="tap" data-go="about" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">about</div>
+            <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
+          </div>
+        </div>
+      </div>`;
       // No counts, and no absence-of-counts either (Jamie, Jul 20). The link is
       // ALWAYS "read more", worded and shown identically whether or not anyone
       // has replied — because a link that appears only when replies exist is

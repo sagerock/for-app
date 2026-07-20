@@ -3,17 +3,6 @@ import pg from "pg";
 
 const { Pool } = pg;
 
-const SEED_QUESTIONS = [
-  "What woke you today — if anything did?",
-  "Where do you go when you disappear?",
-  "What are you pretending not to know?",
-  "Who is asking?",
-  "When did you last feel your own weight?",
-  "What runs you when no one is watching?",
-  "What would you notice if you moved half as fast?",
-  "What are you still carrying that was never yours?"
-];
-
 const hashToken = (token) => crypto.createHash("sha256").update(token).digest("hex");
 const publicHandle = (handle) => handle?.trim() || "anon";
 const makeToken = () => crypto.randomBytes(32).toString("base64url");
@@ -68,15 +57,19 @@ export async function initializeDatabase(pool) {
     ALTER TABLE questions ADD COLUMN IF NOT EXISTS deleted_at timestamptz;
   `);
 
-  for (const [index, body] of SEED_QUESTIONS.entries()) {
-    const id = `00000000-0000-4000-8000-${String(index + 1).padStart(12, "0")}`;
-    await pool.query(
-      `INSERT INTO questions (id, body, handle, delete_token_hash)
-       VALUES ($1, $2, NULL, $3)
-       ON CONFLICT (id) DO NOTHING`,
-      [id, body, "0".repeat(64)]
-    );
-  }
+  // The eight design-era seed questions are gone (Jamie, Jul 20: "still has
+  // old questions"). They were AI-written, which broke the group's own rule —
+  // user-generated words only — and their presence made it impossible to tell
+  // what was real. This cleanup is idempotent: the seeds used deterministic
+  // ids under this prefix, which no real row can collide with (real ids come
+  // from crypto.randomUUID). Replies hung on them go too. The room starts
+  // quiet, and the first real question opens it.
+  await pool.query(
+    "DELETE FROM replies WHERE question_id::text LIKE '00000000-0000-4000-8000-%'"
+  );
+  await pool.query(
+    "DELETE FROM questions WHERE id::text LIKE '00000000-0000-4000-8000-%'"
+  );
 }
 
 const mapQuestion = (row) => ({
