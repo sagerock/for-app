@@ -183,8 +183,8 @@
   const avColor = (n) => { let h = 0; for (const c of n) h = (h * 31 + c.charCodeAt(0)) >>> 0; return AV_COLORS[h % AV_COLORS.length]; };
   const authorRow = (name, note) => `
     <div style="display:flex; align-items:center; gap:9px; margin-top:9px;">
-      <div style="width:24px; height:24px; border-radius:50%; background:${avColor(name)}; display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--fg-strong); font-weight:600;">${esc(initials(name))}</div>
-      <div style="font-size:12.5px; color:var(--muted);">${esc(name)}${note ? ` · <span style="color:var(--faint);">${note}</span>` : ""}</div>
+      <div style="width:24px; height:24px; border-radius:50%; background:${avColor(name)}; display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--fg-strong); font-weight:600;">${esc(initials(name))}</div>
+      <div style="font-size:13.5px; color:var(--muted);">${esc(name)}${note ? ` · <span style="color:var(--faint);">${note}</span>` : ""}</div>
     </div>`;
 
   // ---- Sound: soft two-note chimes via Web Audio -------------------------
@@ -228,7 +228,7 @@
   // default margin indents past the study-room avatar; centered screens pass
   // their own.
   const ownAction = (kind, id, wrap = "margin:8px 0 0 33px;") => canDelete(kind, id)
-    ? `<div style="${wrap}"><span class="tap" data-action="delete" data-kind="${kind}" data-id="${id}" style="font-size:11px; letter-spacing:0.06em; color:var(--faint);">remove my words</span></div>`
+    ? `<div style="${wrap}"><span class="tap" data-action="delete" data-kind="${kind}" data-id="${id}" style="font-size:12px; letter-spacing:0.06em; color:var(--faint);">remove my words</span></div>`
     : "";
 
   // ---- Pause building blocks ----------------------------------------------
@@ -254,8 +254,8 @@
       <div style="position:absolute; width:190px; height:190px; border-radius:50%; border:1px solid var(--accent); animation:forBreathe 11s ease-in-out infinite;"></div>
       <div style="position:absolute; width:190px; height:190px; border-radius:50%; background:var(--accent-glow); animation:forBreathe 11s ease-in-out infinite;"></div>
       <div id="breathWords" style="position:relative; width:72px; height:18px; transition:opacity 1s ease;">
-        <span style="position:absolute; inset:0; text-align:center; font-size:12px; letter-spacing:0.22em; color:var(--fg-strong); animation:forInWord 11s ease-in-out infinite;">in</span>
-        <span style="position:absolute; inset:0; text-align:center; font-size:12px; letter-spacing:0.22em; color:var(--fg-strong); animation:forOutWord 11s ease-in-out infinite;">out</span>
+        <span style="position:absolute; inset:0; text-align:center; font-size:13px; letter-spacing:0.22em; color:var(--fg-strong); animation:forInWord 11s ease-in-out infinite;">in</span>
+        <span style="position:absolute; inset:0; text-align:center; font-size:13px; letter-spacing:0.22em; color:var(--fg-strong); animation:forOutWord 11s ease-in-out infinite;">out</span>
       </div>
     </div>`;
 
@@ -303,7 +303,7 @@
   function pushSectionHTML() {
     if (state.pushState === "on") return `
       <div style="font-size:14.5px; line-height:1.7; color:var(--muted); margin-bottom:14px;">Forth may call at an unexpected moment. Nothing else will be sent.</div>
-      <span class="tap" data-action="disablePush" style="font-size:12px; letter-spacing:0.1em; color:var(--faint);">silence the call</span>`;
+      <span class="tap" data-action="disablePush" style="font-size:13px; letter-spacing:0.1em; color:var(--faint);">silence the call</span>`;
     if (state.pushState === "install") return `
       <div style="font-size:14.5px; line-height:1.7; color:var(--muted);">In Safari, use Share and <em>Add to Home Screen</em>. Open Forth from there to allow the call.</div>`;
     if (state.pushState === "ready") return `
@@ -319,7 +319,7 @@
     return `
       <div class="serif" style="font-size:18px; color:var(--fg-strong); margin-bottom:8px;">Your words</div>
       <div style="font-size:14.5px; line-height:1.7; color:var(--muted); margin-bottom:14px;">This device remembers only what it needs to remove words written here.</div>
-      <span class="tap" data-action="deleteAll" style="font-size:12px; letter-spacing:0.1em; color:var(--faint);">remove my words from this device</span>
+      <span class="tap" data-action="deleteAll" style="font-size:13px; letter-spacing:0.1em; color:var(--faint);">remove my words from this device</span>
       <div style="height:28px;"></div>`;
   }
 
@@ -335,7 +335,7 @@
         <div style="flex:1"></div>
         <div class="serif" style="font-size:64px; font-weight:400; line-height:1; color:var(--fg-strong); animation:forNow 5.2s cubic-bezier(0.22,0.6,0.36,1) both;">I am</div>
         <div style="flex:1"></div>
-        <div style="font-size:12.5px; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted);">self-remembering</div>
+        <div style="font-size:13.5px; letter-spacing:0.28em; text-transform:uppercase; color:var(--muted);">self-remembering</div>
       </div>`,
 
     // The guided pause: body -> breath -> mind. The image runs CONTINUOUSLY the
@@ -369,8 +369,8 @@
         <div style="flex:1"></div>
         <div style="display:flex; flex-direction:column; align-items:center; gap:18px; animation:forHint 4s ease both;">
           <div style="display:flex; gap:26px;">
-            <div class="tap" data-go="about" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">about</div>
-            <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
+            <div class="tap" data-go="about" style="font-size:13.5px; letter-spacing:0.14em; color:var(--faint);">about</div>
+            <div class="tap" data-go="rest" style="font-size:13.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
           </div>
         </div>
       </div>`;
@@ -389,8 +389,8 @@
         <div style="display:flex; flex-direction:column; align-items:center; gap:18px; animation:forHint 4s ease both;">
           ${state.callIds.length < 2 ? `<span class="tap act" data-action="another" style="color:var(--muted);">another</span>` : ``}
           <div style="display:flex; gap:26px;">
-            <div class="tap" data-go="about" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">about</div>
-            <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
+            <div class="tap" data-go="about" style="font-size:13.5px; letter-spacing:0.14em; color:var(--faint);">about</div>
+            <div class="tap" data-go="rest" style="font-size:13.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
           </div>
         </div>
       </div>`;
@@ -422,8 +422,8 @@
             <span class="tap act" data-go="byoq" style="color:var(--muted);">Ask a question</span>
           </div>
           <div style="display:flex; gap:26px;">
-            <div class="tap" data-go="about" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">about</div>
-            <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
+            <div class="tap" data-go="about" style="font-size:13.5px; letter-spacing:0.14em; color:var(--faint);">about</div>
+            <div class="tap" data-go="rest" style="font-size:13.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
           </div>
         </div>
       </div>`;
@@ -439,15 +439,15 @@
         <textarea id="respondInput" rows="5" placeholder="Say only what's true. No one is timing you." style="width:100%; background:transparent; border:none; border-bottom:1px solid var(--hair); padding:8px 0; font-family:'Source Serif 4',serif; font-size:19px; line-height:1.5; color:var(--fg-strong); resize:none;"></textarea>
         <div style="flex:1"></div>
         <div class="tap act" data-action="reply" style="align-self:center; color:var(--accent); border:1px solid var(--accent-line); border-radius:999px; padding:13px 32px;">Reply</div>
-        <div style="text-align:center; margin-top:14px; font-size:11.5px; letter-spacing:0.1em; color:var(--faint);">when you reply, it will hold you a moment</div>
-        <div class="tap" data-go="rest" style="text-align:center; margin-top:20px; font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
+        <div style="text-align:center; margin-top:14px; font-size:12.5px; letter-spacing:0.1em; color:var(--faint);">when you reply, it will hold you a moment</div>
+        <div class="tap" data-go="rest" style="text-align:center; margin-top:20px; font-size:13.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
       </div>`;
     },
 
     freeze: () => `
       <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:64px; animation:forFade 1.4s ease both;">
         <div style="width:9px; height:9px; border-radius:50%; background:var(--accent); opacity:0.8; animation:forBreathe 6s ease-in-out infinite;"></div>
-        <div style="margin-top:32px; font-size:12px; letter-spacing:0.26em; text-transform:uppercase; color:var(--faint); animation:forHint 5s ease both;">held</div>
+        <div style="margin-top:32px; font-size:13px; letter-spacing:0.26em; text-transform:uppercase; color:var(--faint); animation:forHint 5s ease both;">held</div>
       </div>`,
 
     // After the pause: a still point — just the dot, quietly alive, ~5s —
@@ -464,12 +464,12 @@
         <div style="flex:1"></div>
         <div class="tap" data-go="rest" style="display:flex; flex-direction:column; align-items:center; gap:8px; padding:18px 48px; animation:forRise 2.2s ease 0.4s both;">
           <div class="serif" style="font-size:27px; color:var(--fg-strong);">forth</div>
-          <div style="font-size:11.5px; letter-spacing:0.22em; text-transform:uppercase; color:var(--faint);">leave</div>
+          <div style="font-size:12.5px; letter-spacing:0.22em; text-transform:uppercase; color:var(--faint);">leave</div>
         </div>
         <div style="height:40px;"></div>
         <div class="tap" data-go="questions" style="display:flex; flex-direction:column; align-items:center; gap:8px; padding:18px 48px; animation:forRise 2.2s ease 1.3s both;">
           <div class="serif" style="font-size:27px; color:var(--fg-strong);">question</div>
-          <div style="font-size:11.5px; letter-spacing:0.22em; text-transform:uppercase; color:var(--faint);">stay</div>
+          <div style="font-size:12.5px; letter-spacing:0.22em; text-transform:uppercase; color:var(--faint);">stay</div>
         </div>
         <div style="flex:1"></div>
       </div>`,
@@ -518,7 +518,7 @@
               <div style="font-size:14.5px; line-height:1.7; color:var(--muted);">${b}</div>
             </div>`).join("")}
         </div>
-        <div class="tap" data-go="rest" style="text-align:center; margin-top:30px; font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
+        <div class="tap" data-go="rest" style="text-align:center; margin-top:30px; font-size:13.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
       </div>`,
 
     byoq: () => state.byoqStage === "open" ? `
@@ -530,13 +530,13 @@
         <textarea id="byoqInput" rows="3" placeholder="What do you want to sit with?" style="width:100%; background:transparent; border:none; border-bottom:1px solid var(--hair); padding:8px 0; font-family:'Source Serif 4',serif; font-size:20px; line-height:1.4; color:var(--fg-strong); resize:none;"></textarea>
         <div style="flex:1"></div>
         <div class="tap act" data-action="submitByoq" style="align-self:center; color:var(--accent); border:1px solid var(--accent-line); border-radius:999px; padding:13px 30px;">Leave it</div>
-        <div class="tap" data-go="rest" style="text-align:center; margin-top:20px; font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
+        <div class="tap" data-go="rest" style="text-align:center; margin-top:20px; font-size:13.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
       </div>` : `
       <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:64px 34px; animation:forFade 1.4s ease both;">
         <div class="serif" style="font-style:italic; font-size:22px; color:var(--fg-strong); margin-bottom:14px;">It's with the group.</div>
         <div style="font-size:14px; line-height:1.7; color:var(--muted); max-width:250px; margin-bottom:30px;">Let it be. It will find you, or someone, another day.</div>
         ${state.lastQuestionId ? ownAction("questions", state.lastQuestionId, "margin-bottom:22px;") : ""}
-        <div class="tap" data-go="rest" style="font-size:12.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
+        <div class="tap" data-go="rest" style="font-size:13.5px; letter-spacing:0.14em; color:var(--faint);">leave</div>
       </div>`,
 
     roomError: () => `
